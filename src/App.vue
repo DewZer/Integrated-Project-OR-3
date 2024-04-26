@@ -41,17 +41,25 @@ const formatStatus = (status) => {
   }
 };
 
-const formatDate = (date) => {
-  const dt = new Date(date);
-  const day = String(dt.getDate()).padStart(2, '0');
-  const month = String(dt.getMonth() + 1).padStart(2, '0'); // January is 0!
-  const year = dt.getFullYear();
-  const hours = String(dt.getHours()).padStart(2, '0');
-  const minutes = String(dt.getMinutes()).padStart(2, '0');
-  const seconds = String(dt.getSeconds()).padStart(2, '0');
-
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+  };
+  return date.toLocaleString('en-GB', options);
 };
+
+
+// Get the timezone
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+console.log(timezone);
+
+
 </script>
 
 <template>
@@ -106,11 +114,14 @@ const formatDate = (date) => {
       <p class="itbkk-status text-md text-white-700mt-2">
         Status: <span class="font-semibold">{{ formatStatus(selectedTodo.status) }}</span>
       </p>
+      <p class="itbkk-timezone text-md text-white-700 mt-2">
+        Timezone: <span class="font-semibold">{{ timezone }}</span>
+      </p>
       <p class="itbkk-created-on text-md text-white-700mt-2">
-        Created On: <span class="font-semibold">{{ formatDate(selectedTodo.createdOn) }}</span>
+        Created On: <span class="font-semibold">{{formatDate(selectedTodo.createdOn) }}</span>
       </p>
       <p class="itbkk-updated-on text-md text-white-700 mt-2">
-        Updated On: <span class="font-semibold">{{ formatDate(selectedTodo.updatedOn) }}</span>
+        Updated On: <span class="font-semibold">{{formatDate(selectedTodo.updatedOn ) }}</span>
       </p>
       <div class="modal-action mt-6 flex justify-end">
         <button class="btn bg-blue-500 text-white mr-2" @click="showModal = false">Save</button>
