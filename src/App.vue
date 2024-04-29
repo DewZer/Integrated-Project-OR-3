@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+
+import { nextTick } from 'vue';
 import autosize from "autosize";
 
 const descriptionTextarea = ref(null);
@@ -12,7 +14,7 @@ const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://localhost:8080/api/tasks");
+    const response = await fetch("http://localhost:8080/it-bkk/v1/tasks");
     const data = await response.json();
     todos.value = data.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
@@ -24,7 +26,7 @@ const fetchTodos = async () => {
 
 const deleteTodoById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+    const response = await fetch(`http://localhost:8080/it-bkk/v1/tasks/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -40,7 +42,7 @@ const deleteTodoById = async (id) => {
 
 const fetchDataById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8080/api/tasks/${id}`);
+    const response = await fetch(`http://localhost:8080/it-bkk/v1/tasks/${id}`);
     const selectedData = await response.json();
     selectedTodo.value = selectedData;
   } catch (error) {
@@ -53,7 +55,7 @@ const addTodo = async (newTodo, todos) => {
   newTodo.createdOn = new Date().toISOString().slice(0, 19).replace("T", " ");
   newTodo.updatedOn = new Date().toISOString().slice(0, 19).replace("T", " ");
   try {
-    const response = await fetch("http://localhost:8080/api/tasks", {
+    const response = await fetch("http://localhost:8080/it-bkk/v1/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,11 +76,13 @@ const addTodo = async (newTodo, todos) => {
 const tableHeader =
   "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider";
 
+
 const editTodo = async (todo) => {
   await fetchDataById(todo.id);
-  console.log("selectd todo:", selectedTodo._rawValue);
   showEditModal.value = true;
-  console.log(showEditModal.value);
+  nextTick(() => {
+    openModal();
+  });
 };
 
 const confirmDelete = (todo) => {
@@ -97,7 +101,10 @@ const options = {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString("en-GB", options);
+  console.log('Original date:', date);
+  const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
+  console.log('Formatted date:', formattedDate);
+  return formattedDate;
 };
 
 const formatStatus = (status) => {
@@ -110,6 +117,15 @@ const formatStatus = (status) => {
       return `Doing`;
     case "DONE":
       return `Done`;
+  }
+};
+
+const openModal = () => {
+  const modal = document.getElementById('my_modal_1');
+  if (modal) {
+    modal.showModal();
+  } else {
+    console.error('Modal with id "my_modal_1" not found');
   }
 };
 
@@ -166,11 +182,8 @@ onMounted(() => {
           :key="todo.id"
           class="itbkk-item border-gray-600 hover:bg-gray-700 hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-110"
         >
-          <td >
-          <button @click="editTodo(todo)" 
-          class="itbkk-title py-2 w-1/5"
-          >{{ todo.title }}
-        </button>  
+          <td 
+             class="itbkk-title btn"@click="editTodo(todo)">{{ todo.title }}>
           </td>
           <td class="itbkk-assignees py-2 w-1/5 italic">
             {{ todo.assignees ? todo.assignees : "Unassigned" }}
@@ -188,7 +201,7 @@ onMounted(() => {
             </button>
           </td>
           <td>
-            <button class="btn"@click="editTodo(todo)" onclick="my_modal_1.showModal()">edit</button>
+            <button class="btn" @click="editTodo(todo);openModal()">edit</button>
           </td>
         </tr>
       </tbody>
@@ -209,12 +222,10 @@ onMounted(() => {
         <h2 class="text-xl mb-2">Description</h2>
         <textarea
           ref="descriptionTextarea"
-          class="itbkk-description py-20 p-4 rounded mb-4 text-lg bg-gray-800 w-full max-h-[500px]"
-          :placeholder="
-            selectedTodo.description ? null : 'No Description Provided'
-          "
-          >{{ selectedTodo.description }}</textarea
-        >
+          class="itbkk-description py-20 p-4 rounded mb-4 text-lg bg-gray-800 w-full max-h-[500px] italic"
+        
+          >{{ selectedTodo.description ? selectedTodo.description : 'No Description Provided' }} 
+          </textarea>
 
         <p
           class="itbkk-assignees py-2 p-4 bg-gray-800 rounded mb-4 text-lg"
