@@ -5,6 +5,10 @@ import autosize from "autosize";
 const descriptionTextarea = ref(null);
 const showDeleteModal = ref(false);
 const selectedDeletedTodo = ref(null);
+const todos = ref([]);
+let showEditModal = ref(false);
+const selectedTodo = ref(null);
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const fetchTodos = async () => {
   try {
@@ -44,28 +48,10 @@ const fetchDataById = async (id) => {
   }
 };
 
-// const addTodo = async (newTodo) => {
-//   try {
-//     console.log(newTodo);
-//     const response = await fetch("http://localhost:8080/api/tasks", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(newTodo),
-//     });
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`);
-//     }
-//     const data = await response.json();
-//     this.todos.push(data);
-//   } catch (error) {
-//     console.error("Error:", error);
-//   }
-// };
-
 const addTodo = async (newTodo, todos) => {
   newTodo.id = todos.length + 1;
+  newTodo.createdOn = new Date().toISOString().slice(0, 19).replace("T", " ");
+  newTodo.updatedOn = new Date().toISOString().slice(0, 19).replace("T", " ");
   try {
     const response = await fetch("http://localhost:8080/api/tasks", {
       method: "POST",
@@ -87,13 +73,12 @@ const addTodo = async (newTodo, todos) => {
 
 const tableHeader =
   "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider";
-const todos = ref([]);
-const showModal = ref(false);
-const selectedTodo = ref(null);
 
-const editTodo = (todo) => {
-  fetchDataById(todo.id);
-  showModal.value = true;
+const editTodo = async (todo) => {
+  await fetchDataById(todo.id);
+  console.log("selectd todo:", selectedTodo._rawValue);
+  showEditModal.value = true;
+  console.log(showEditModal.value);
 };
 
 const confirmDelete = (todo) => {
@@ -114,10 +99,6 @@ const options = {
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString("en-GB", options);
 };
-
-// Get the timezone
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-console.log(timezone);
 
 const formatStatus = (status) => {
   switch (status) {
@@ -152,18 +133,25 @@ onMounted(() => {
       <!-- head -->
       <thead class="bg-gray-700">
         <tr>
-          <th class="w-1/5">Id</th>
           <th class="w-1/5">Title</th>
           <th class="w-1/5">Assignees</th>
           <th class="w-1/5">Status</th>
-          <th class="w-1/5"></th>
           <th class="w-1/5">
             <button
-  @click="addTodo({ title: 'New Todo', assignees: 'John Doe', status: 'NO_STATUS' }, todos)"
-  class="btn btn-outline btn-primary bg-green-500 text-white py-2 px-4 rounded"
->
-  Add Todo
-</button>
+              @click="
+                addTodo(
+                  {
+                    title: 'New Todo',
+                    assignees: 'John Doe',
+                    status: 'NO_STATUS',
+                  },
+                  todos
+                )
+              "
+              class="btn btn-outline btn-primary bg-green-500 text-white py-2 px-4 rounded"
+            >
+              Add Todo
+            </button>
           </th>
         </tr>
       </thead>
@@ -178,8 +166,12 @@ onMounted(() => {
           :key="todo.id"
           class="itbkk-item border-gray-600 hover:bg-gray-700 hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-110"
         >
-          <td class="py-2 w-1/5">{{ todo.id }}</td>
-          <td class="itbkk-title py-2 w-1/5">{{ todo.title }}</td>
+          <td >
+          <button @click="editTodo(todo)" 
+          class="itbkk-title py-2 w-1/5"
+          >{{ todo.title }}
+        </button>  
+          </td>
           <td class="itbkk-assignees py-2 w-1/5 italic">
             {{ todo.assignees ? todo.assignees : "Unassigned" }}
           </td>
@@ -195,14 +187,8 @@ onMounted(() => {
               Delete
             </button>
           </td>
-          <td class="py-2 w-1/5">
-            <button
-              class="btn btn-outline btn-primary bg-blue-500 text-white py-2 px-4 rounded"
-              @click="editTodo(todo)"
-              onclick="my_modal_4.showModal()"
-            >
-              Edit
-            </button>
+          <td>
+            <button class="btn"@click="editTodo(todo)" onclick="my_modal_1.showModal()">edit</button>
           </td>
         </tr>
       </tbody>
@@ -210,7 +196,7 @@ onMounted(() => {
 
     <!-- edit modal -->
 
-    <dialog v-if="selectedTodo" id="my_modal_4" class="modal">
+    <dialog v-if="showEditModal" id="my_modal_1" class="modal">
       <div
         class="modal-box w-[500px] h-[200px] p-6 bg-blue-900 rounded shadow-lg"
       >
@@ -241,7 +227,12 @@ onMounted(() => {
           class="itbkk-status py-2 p-4 bg-gray-800 rounded mb-4 text-lg"
           style="overflow-wrap: break-word"
         >
-          Status: {{ formatStatus(selectedTodo.status) }}
+          Status: <select v-model="selectedTodo.status" class="itbkk-status py-2 p-4 bg-gray-800 rounded mb-4 text-lg">
+  <option value="NO_STATUS">No Status</option>
+  <option value="TODO">To Do</option>
+  <option value="DOING">Doing</option>
+  <option value="DONE">Done</option>
+</select>
         </p>
         <p
           class="itbkk-timezone py-2 p-4 bg-gray-800 rounded mb-4 text-lg"
@@ -273,26 +264,26 @@ onMounted(() => {
         </div>
       </div>
     </dialog>
-  </div>
 
-  <!-- delete modal -->
-  <dialog v-if="showDeleteModal" id="my_modal_5" class="modal">
-    <div>
-      <h3>Are you sure you want to delete this task?</h3>
-      <button
-        @click="deleteTodoById(selectedDeletedTodo.id)"
-        class="btn btn-outline btn-danger bg-red-500 text-white py-2 px-4 rounded"
-      >
-        Delete
-      </button>
-      <button
-        @click="showDeleteModal = false"
-        class="btn btn-outline btn-primary bg-blue-500 text-white py-2 px-4 rounded"
-      >
-        Cancel
-      </button>
-    </div>
-  </dialog>
+    <!-- delete modal -->
+    <dialog v-if="showDeleteModal" id="my_modal_5" class="modal">
+      <div class="bg-blue-500">
+        <h3>Are you sure you want to delete this task?</h3>
+        <button
+          @click="deleteTodoById(selectedDeletedTodo.id)"
+          class="btn btn-outline btn-danger bg-red-500 text-white py-2 px-4 rounded"
+        >
+          Delete
+        </button>
+        <button
+          @click="showDeleteModal = false"
+          class="btn btn-outline btn-primary bg-blue-500 text-white py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+      </div>
+    </dialog>
+  </div>
 </template>
 
 <style scoped>
