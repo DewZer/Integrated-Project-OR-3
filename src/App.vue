@@ -183,7 +183,7 @@ onMounted(() => {
           class="itbkk-item border-gray-600 hover:bg-gray-700 hover:shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-110"
         >
           <td 
-             class="itbkk-title btn"@click="editTodo(todo)">{{ todo.title }}>
+             class="itbkk-title btn" @click="editTodo(todo)">{{ todo.title }}>
           </td>
           <td class="itbkk-assignees py-2 w-1/5 italic">
             {{ todo.assignees ? todo.assignees : "Unassigned" }}
