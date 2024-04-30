@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-
+import { createRouter, createWebHistory } from 'vue-router';
 import { nextTick } from 'vue';
 import autosize from "autosize";
 
