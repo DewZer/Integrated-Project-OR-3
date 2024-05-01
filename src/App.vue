@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { createRouter, createWebHistory } from 'vue-router';
 import { nextTick } from 'vue';
 import autosize from "autosize";
+const url = "http://localhost:8080/itb-kk/v1/tasks";
 
 const descriptionTextarea = ref(null);
 const showDeleteModal = ref(false);
@@ -14,7 +15,7 @@ const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://localhost:8080/it-bkk/v1/tasks");
+    const response = await fetch(url);
     const data = await response.json();
     todos.value = data.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
@@ -26,7 +27,7 @@ const fetchTodos = async () => {
 
 const deleteTodoById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8080/it-bkk/v1/tasks/${id}`, {
+    const response = await fetch(`${url}/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -42,7 +43,7 @@ const deleteTodoById = async (id) => {
 
 const fetchDataById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8080/it-bkk/v1/tasks/${id}`);
+    const response = await fetch(`${url}/${id}`);
     const selectedData = await response.json();
     selectedTodo.value = selectedData;
   } catch (error) {
@@ -111,7 +112,7 @@ const formatStatus = (status) => {
   switch (status) {
     case "NO_STATUS":
       return "No Status";
-    case "TODO":
+    case "TO_DO":
       return `To Do`;
     case "DOING":
       return `Doing`;
