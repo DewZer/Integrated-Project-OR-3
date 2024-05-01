@@ -15,13 +15,10 @@ const goToEdit = (id) => {
   router.push({ path: `/tasks/${id}` });
 };
 
-const goToDelete = (id) => {
-  router.push({ path: `/tasks/${id}/confirmDelete` });
-};
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks");
     const data = await response.json();
     todos.value = data.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
@@ -33,7 +30,7 @@ const fetchTodos = async () => {
 
 const deleteTodoById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8080/itb-kk/v1/tasks/${id}`, {
+    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
