@@ -18,6 +18,10 @@ const closeModal = () => {
   router.push('/tasks');
 };
 
+const goToTasks = () => {
+  router.push('/tasks');
+};
+
 const formatStatus = (status) => {
   switch (status) {
     case "NO_STATUS":
@@ -31,18 +35,6 @@ const formatStatus = (status) => {
   }
 };
 
-const fetchTodos = async () => {
-  try {
-    const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    allTodos.value = data;
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
 
 
 const addTodo = async () => {
@@ -50,28 +42,31 @@ const addTodo = async () => {
     errorMessage.value = 'Title is required';
     return;
   }
+  const todo = { ...newTodo.value };
+  if (!todo.description) {
+    delete todo.description;
+  }
+  if (!todo.assignees) {
+    delete todo.assignees;
+  }
 
   try {
-    // Fetch all tasks
     const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const todos = await response.json();
 
-    // Find the task with the highest id
     const maxId = Math.max(...todos.map(todo => todo.id));
 
-    // Use maxId + 1 as the id of the new task
-    newTodo.value.id = maxId + 1;
+    todo.id = maxId + 1;
 
-    // Send POST request with newTodo.value
     const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(newTodo.value),
+      body: JSON.stringify(todo),
     });
     if (!response2.ok) {
       throw new Error(`HTTP error! status: ${response2.status}`);
@@ -127,7 +122,7 @@ const addTodo = async () => {
             type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                 Save
             </button>
-            <button @click="closeModal = false"
+            <button @click="goToTasks"
             type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
                 Close 
             </button>
