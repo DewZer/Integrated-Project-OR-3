@@ -1,24 +1,27 @@
 <script setup>
 import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from 'vue-router';
+import { useToast } from "vue-toastification";
 
-const descriptionTextarea = ref(null);
 const showDeleteModal = ref(false);
 const selectedDeletedTodo = ref(null);
 const todos = ref([]);
-const showEditModal = ref(false);
-const selectedTodo = ref(null);
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const router = useRouter();
+const deleteButton = ref(null);
+
+
+const toast = useToast();
+
+
 
 const goToEdit = (id) => {
-  router.push({ path: `/tasks/${id}` });
+  router.push({ path: `/task/${id}` });
 };
 
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks");
+    const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
     const data = await response.json();
     todos.value = data.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
@@ -30,10 +33,14 @@ const fetchTodos = async () => {
 
 const deleteTodoById = async (id) => {
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`, {
+    const response = await fetch(`http://localhost:8080/itb-kk/v1/tasks/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) {
+    if (response.ok) {
+      toast.success("The task has been deleted");
+    } else if (response.status === 404) {
+      toast.error("An error has occurred, the task does not exist.");
+    } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     showDeleteModal.value = false;
@@ -43,19 +50,22 @@ const deleteTodoById = async (id) => {
     console.error("Error:", error);
   }
 };
-const openDeleteModal = (id) => {
-  selectedDeletedTodo.value = todos.value.find(todo => todo.id === id);
-  showDeleteModal.value = true;
-};
 
 
 const confirmDelete = async () => {
   await deleteTodoById(selectedDeletedTodo.value.id);
   showDeleteModal.value = false;
 };
+const openDeleteModal = (id) => {
+  selectedDeletedTodo.value = todos.value.find(todo => todo.id === id);
+  showDeleteModal.value = true;
+  nextTick(() => {
+    deleteButton.value.focus();
+  });
+};
 
 const gotoAdd = () => {
-  router.push({ path: '/tasks/add' });
+  router.push({ path: '/task/add' });
 };
 
 
@@ -116,15 +126,15 @@ onMounted(() => {
         <tr 
           v-for="todo in todos"
           :key="todo.id"
-          class="hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-110"
+          class="itbkk-item hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-110"
         >
-        <td class="Title px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer" @click="goToEdit(todo.id)">
+        <td class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer" @click="goToEdit(todo.id)">
     {{ todo.title }}
   </td>
-          <td class="Assignees px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          <td class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-gray-500 italic">
             {{ todo.assignees ? todo.assignees : "Unassigned" }}
           </td>
-          <td class="Status px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          <td class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-500">
             {{ formatStatus(todo.status) }}
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -156,7 +166,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-        <button @click="confirmDelete"
+        <button @click="confirmDelete" @keyup="confirmDelete" ref="deleteButton"
         type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
           Delete
         </button>
@@ -168,5 +178,8 @@ onMounted(() => {
     </div>
   </div>
   </div>
-  
+
+
+
+
 </template>
