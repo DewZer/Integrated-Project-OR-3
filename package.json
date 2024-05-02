@@ -15,10 +15,13 @@
     "test:unit:dev": "cypress open --component"
   },
   "dependencies": {
+    "@kyvg/vue3-notification": "^3.2.1",
+    "@vueuse/head": "^2.0.0",
     "autosize": "^6.0.1",
     "flowbite": "^2.3.0",
     "vue": "^3.4.21",
-    "vue-router": "^4.0.13"
+    "vue-router": "^4.0.13",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

@@ -1,6 +1,10 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
+
 
 const showAddModal = ref(true);
 let errorMessage = ref('');
@@ -15,11 +19,11 @@ const router = useRouter();
 
 const closeModal = () => {
   showAddModal.value = false;
-  router.push('/tasks');
+  router.push('/task');
 };
 
 const goToTasks = () => {
-  router.push('/tasks');
+  router.push('/task');
 };
 
 const formatStatus = (status) => {
@@ -57,20 +61,27 @@ const addTodo = async () => {
     }
     const todos = await response.json();
 
-    const maxId = Math.max(...todos.map(todo => todo.id));
-
+    let maxId =0
+    if (todos.length > 0) {
+      maxId = Math.max(...todos.map(todo => todo.id));
+    }
     todo.id = maxId + 1;
 
     const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(todo),
-    });
-    if (!response2.ok) {
-      throw new Error(`HTTP error! status: ${response2.status}`);
-    }
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(todo),
+  });
+  if (response2.status === 200) {
+    toast.success("Task added successfully");
+  } else {
+    throw new Error(`HTTP error! status: ${response2.status}`);
+
+  }
+
+    
     const data = await response2.json();
     allTodos.value.push(data);
     errorMessage.value = '';
@@ -81,11 +92,14 @@ const addTodo = async () => {
       assignees: '',
       status: 'NO_STATUS',
     };
-    router.push('/tasks');
+    router.push('/task');
   } catch (error) {
     console.error("Error:", error);
   }
 };
+
+const emit = defineEmits(['task-added']);
+
 
 </script>
 
