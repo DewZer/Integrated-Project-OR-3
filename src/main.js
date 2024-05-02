@@ -14,6 +14,7 @@ import "vue-toastification/dist/index.css";
 const routes = [
   { path: '/task', component: task },
   { path: '/', redirect: '/tasks' },
+  { path: '/:pathMatch(.*)*', redirect: '/task' },
   { path: '/task/:id', component: editTasks, props: true, name: 'editTasks' },
   { path: '/task/add', component: newTask, props: true, name: 'newTask' }
 ]

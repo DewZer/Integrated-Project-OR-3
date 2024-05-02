@@ -79,9 +79,9 @@ const addTodo = async () => {
   } else {
     throw new Error(`HTTP error! status: ${response2.status}`);
 
+
   }
 
-    
     const data = await response2.json();
     allTodos.value.push(data);
     errorMessage.value = '';

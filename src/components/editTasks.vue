@@ -10,7 +10,7 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 let errorMessage = ref("");
-let assigneesText = ref('');
+let assigneesText = ref("");
 
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -24,7 +24,7 @@ const fetchDataById = async (id) => {
     selectedTodo.value = data;
     assigneesText.value = data.assignees;
     console.log(selectedTodo.value);
-    showEditModal.value = true; 
+    showEditModal.value = true;
   } catch (error) {
     console.error("Error:", error);
     alert("No task found with this ID");
@@ -128,45 +128,43 @@ onMounted(() => {
 </script>
 
 <template>
+  <div v-if="showEditModal" class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center">
+    <div class="bg-gray-800 rounded-lg text-white text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-70% flex flex-col" style="min-width: 80%; max-width: 100%; height: 80%; overflow: auto;">
+      <div class="bg-grey sm:p-6 sm:pb-4 flex-grow">
+        <div class="sm:flex sm:items-start flex">
+          <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
 
-<div
-    v-if="showEditModal"
-    class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center"
-  >
-    <div
-      class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-6xl sm:w-full bg-opacity-50"
-    >
-      <div 
-      class="bg-white px-6 py-6 sm:p-6 sm:pb-4"
-      >
-        <div class="sm:flex sm:items-start">
-          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
+              <label for="title" class="label">
+                <span class="label-text">Title</span>
+              </label>
               <input
                 type="text"
                 v-model="selectedTodo.title"
-                class="itbkk-title block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                class="input input-bordered w-full bg-gray-500 rounded-lg text-white"
               />
             </h3>
-            <div class="mt-2">
+
+            <div class="mt-2 ">
+              <label for="description" class="label">
+                <span class="label-text">Description</span>
+              </label>
               <textarea
                 v-model="selectedTodo.description"
-                class="itbkk-description block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md h-64 overflow-y-auto"
+                class="te xtarea textarea-bordered w-full h-32 bg-gray-500 rounded-lg"
               >
                 {{ selectedTodo.description || "No Description Provided" }}
               </textarea>
             </div>
+
             <div class="mt-2">
-              <label
-                for="status"
-                class="itbkk-status block text-sm font-medium text-gray-700"
-              >
-                Status
+              <label for="status" class="label">
+                <span class="label-text">Status</span>
               </label>
               <select
                 id="status"
                 v-model="selectedTodo.status"
-                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                class="select select-bordered w-full"
               >
                 <option
                   v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
@@ -175,42 +173,51 @@ onMounted(() => {
                   {{ formatStatus(status) }}
                 </option>
               </select>
-              <p class="itbkk-timezone text-lg text-gray-700 p-3 rounded-md shadow-md">Timezone: {{ timezone }}</p>
+
+              <p class="mt-2 text-lg text-white-700 p-3 rounded-md shadow-md">
+                Timezone: {{ timezone }}
+              </p>
+
               <div class="mt-2">
-                <label for="itbkk-assignees" class="block text-sm font-medium text-gray-700">Assignees</label>
+                <label for="itbkk-assignees" class="label">
+                  <span class="label-text">Assignees</span>
+                </label>
                 <input
                   id="assignees"
                   v-model="assigneesText"
-                  class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  class="input input-bordered w-full"
                 />
               </div>
-              <div class="itbkk-created-on  mt-2">
-                <label class="block text-sm font-medium text-gray-700"
-                  >Created On</label
-                >
+
+              <div class="mt-2">
+                <label class="label">
+                  <span class="label-text">Created On</span>
+                </label>
                 <p>{{ formatDate(selectedTodo.createdOn) }}</p>
               </div>
-              <div class="itbkk-updated-on  mt-2">
-                <label class="block text-sm font-medium text-gray-700"
-                  >Updated On</label
-                >
+
+              <div class="mt-2">
+                <label class="label">
+                  <span class="label-text">Updated On</span>
+                </label>
                 <p>{{ formatDate(selectedTodo.updatedOn) }}</p>
               </div>
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+
+        <div class="sm:flex justify-end">
           <button
             @click="closeModalWithEdit"
             type="button"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+            class="btn btn-primary ml-2 bg-white"
           >
             Save
           </button>
           <button
             @click="closeModal"
             type="button"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+            class="btn btn-outline btn-secondary bg-white" 
           >
             Close
           </button>
