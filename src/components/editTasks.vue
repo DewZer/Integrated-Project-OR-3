@@ -16,7 +16,7 @@ const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const fetchDataById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:8080/itb-kk/v1/tasks/${id}`);
+    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`);
     if (!response.ok) {
       throw new Error("No task found with this ID");
     }
@@ -48,7 +48,7 @@ const closeModalWithEdit = async () => {
 
   try {
     const response = await fetch(
-      `http://localhost:8080/itb-kk/v1/tasks/${todoToUpdate.id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${todoToUpdate.id}`,
       {
         method: "POST",
         headers: {

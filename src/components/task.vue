@@ -17,7 +17,7 @@ const goToEdit = (id) => {
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks");
     const data = await response.json();
     todos.value = data.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
@@ -35,6 +35,7 @@ const deleteTodoById = async (id) => {
         method: "DELETE",
       }
     );
+
     if (response.ok) {
       toast.success("The task has been deleted");
     } else if (response.status === 404) {
