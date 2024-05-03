@@ -30,7 +30,7 @@ const fetchTodos = async () => {
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://localhost:8080/itb-kk/v1/tasks/${id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -86,17 +86,31 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="sticky top-0 flex flex-col items-center pt-12 dark:bg-gray-800">
+  <div class="container mx-auto pt-4 px-4 py-16">
+    <!-- Header -->
+    <div class="flex justify-center w-full mb-7 relative">
+      <span class="text-2xl md:text-3xl font-bold mb-3">
+        ITBKK-Kradan Kanban
+      </span>
+      <span
+        class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-green-600 rounded-full"
+      ></span>
+    </div>
+
     <div>
-      <h1 class="text-2xl font-bold mb-4 text-center text-white">ITBKK-Kradan Kanban</h1>
-      <table class="table-lg style bg-gray-700 dark:bg-gray-700">
-        <thead class="bg-gray-50 w-full dark:bg-gray-600 dark:text-white">
+      <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
+        <thead class="bg-gray-200 w-full">
           <tr>
             <th class="w-1/3 text-black">Title</th>
             <th class="w-1/4 text-black">Assignees</th>
             <th class="w-1/4 text-black">Status</th>
             <th class="1/3">
-              <button @click="gotoAdd" class="btn btn-outline btn-success bg-green-200">Add Todo </button>
+              <button
+                @click="gotoAdd"
+                class="btn btn-outline btn-success bg-green-200 btn-lg"
+              >
+                Add Task
+              </button>
             </th>
             <th></th>
           </tr>
@@ -109,7 +123,7 @@ onMounted(() => {
           >
             <td
               colspan="5"
-              class="1/3 px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+              class="1/3 px-6 py-4 whitespace-nowrap text-sm text-gray-800"
             >
               No task
             </td>
@@ -123,20 +137,31 @@ onMounted(() => {
               class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
               @click="goToEdit(todo.id)"
             >
-              <div class="truncate" :title="todo.title">{{ todo.title }}</div>
+              <div class="truncate text-md font-bold" :title="todo.title">
+                {{ todo.title }}
+              </div>
             </td>
             <td
-              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-gray-500 italic"
+              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic"
             >
               {{ todo.assignees ? todo.assignees : "Unassigned" }}
             </td>
             <td
               class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-500"
             >
-              {{ formatStatus(todo.status) }}
+              <div
+                class="rounded-full text-center"
+                :class="`status-${todo.status
+                  .toLowerCase()
+                  .replace(/[\s_]+/g, '-')}`"
+                style="padding: 8px; width: 100px; margin: auto"
+              >
+                {{ formatStatus(todo.status) }}
+              </div>
             </td>
+
             <td
-              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center"
             >
               <button
                 @click="openDeleteModal(todo.id)"
@@ -163,7 +188,7 @@ onMounted(() => {
     <!-- delete modal -->
     <div
       v-if="showDeleteModal"
-      class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center"
+      class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
     >
       <div
         class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
@@ -199,3 +224,32 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style>
+.status-no-status,
+.status-to-do,
+.status-doing,
+.status-done {
+  border-style: solid; /* This makes the border visible */
+  border-width: 1px; /* Adjust the width as needed */
+}
+
+.status-no-status {
+  border-color: blue;
+  color: blue;
+}
+
+.status-to-do {
+  border-color: gray;
+  color: gray;
+}
+.status-doing {
+  border-color: orange;
+  color: orange;
+}
+
+.status-done {
+  border-color: green;
+  color: green;
+}
+</style>
