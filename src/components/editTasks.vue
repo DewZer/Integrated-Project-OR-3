@@ -12,8 +12,6 @@ const router = useRouter();
 let errorMessage = ref("");
 let assigneesText = ref("");
 
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`);
@@ -50,7 +48,7 @@ const closeModalWithEdit = async () => {
     const response = await fetch(
       `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${todoToUpdate.id}`,
       {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -94,9 +92,17 @@ const closeModal = () => {
   router.push({ path: "/task" });
 };
 
-const formatDate = (date) => {
-  const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
-  return formattedDate;
+const formatDate = (dateString) => {
+  const options = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  };
+  return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
 
 const formatStatus = (status) => {
@@ -112,15 +118,7 @@ const formatStatus = (status) => {
   }
 };
 
-const options = {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  timeZone: "UTC",
-};
+
 
 onMounted(() => {
   fetchDataById(route.params.id);
@@ -128,15 +126,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="showEditModal" class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center">
-    <div class="bg-gray-800 rounded-lg text-white text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-70% flex flex-col" style="min-width: 80%; max-width: 100%; height: 80%; overflow: auto;">
+  <div
+    v-if="showEditModal"
+    class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center"
+  >
+    <div
+      class="bg-gray-800 rounded-lg text-white text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-70% flex flex-col"
+      style="min-width: 75%; height: 95%"
+    >
       <div class="bg-grey sm:p-6 sm:pb-4 flex-grow">
         <div class="sm:flex sm:items-start flex">
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
-
             <h3 class="text-lg leading-6 font-medium text-gray-900">
               <label for="title" class="label">
-                <span class="label-text">Title</span>
+                <span class="label-text text-2xl">Title</span>
               </label>
               <input
                 type="text"
@@ -145,26 +148,35 @@ onMounted(() => {
               />
             </h3>
 
-            <div class="mt-2 ">
+            <div class="mt-2">
               <label for="description" class="label">
-                <span class="label-text">Description</span>
+                <span class="label-text text-2xl">Description</span>
               </label>
               <textarea
                 v-model="selectedTodo.description"
-                class="te xtarea textarea-bordered w-full h-32 bg-gray-500 rounded-lg"
-              >
-                {{ selectedTodo.description || "No Description Provided" }}
-              </textarea>
+                :placeholder="selectedTodo.description ? '' : 'Unassigned'"
+                class="textarea textarea-bordered w-full h-32 bg-gray-500 rounded-lg textarea-md text-white text-lg"
+              ></textarea>
+            </div>
+
+
+
+            <div class="mt-2 bg-gray-500 rounded-md">
+              <label for="status" class="label">
+                <span class="label-text text-xl text-white"
+                  >Timezone : {{ getTimeZone() }}</span
+                >
+              </label>
             </div>
 
             <div class="mt-2">
               <label for="status" class="label">
-                <span class="label-text">Status</span>
+                <span class="label-text text-xl">Status</span>
               </label>
               <select
                 id="status"
                 v-model="selectedTodo.status"
-                class="select select-bordered w-full"
+                class="select select-bordered w-full text-lg bg-gray-800 rounded-lg text-white"
               >
                 <option
                   v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
@@ -173,51 +185,56 @@ onMounted(() => {
                   {{ formatStatus(status) }}
                 </option>
               </select>
+            </div>
 
-              <p class="mt-2 text-lg text-white-700 p-3 rounded-md shadow-md">
-                Timezone: {{ timezone }}
-              </p>
+            <div class="mt-2">
+              <label for="itbkk-assignees" class="label">
+                <span class="label-text text-xl">Assignees</span>
+              </label>
+              <input
+  id="assignees"
+  v-model="assigneesText"
+  class="input input-bordered w-full"
+  :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
+/>
+            </div>
 
-              <div class="mt-2">
-                <label for="itbkk-assignees" class="label">
-                  <span class="label-text">Assignees</span>
+            <div class="mt-3 p-3 bg-gray-400 rounded-lg shadow">
+              <div class="mb-2">
+                <label class="label">
+                  <span class="label-text text-lg text-black">Created On</span>
                 </label>
-                <input
-                  id="assignees"
-                  v-model="assigneesText"
-                  class="input input-bordered w-full"
-                />
+                <p class="mt-1 text-xl font-semibold text-gray-900">
+                  {{ formatDate(selectedTodo.createdOn) }}
+                </p>
               </div>
 
               <div class="mt-2">
                 <label class="label">
-                  <span class="label-text">Created On</span>
+                  <span class="label-text text-lg text-black">Updated On</span>
                 </label>
-                <p>{{ formatDate(selectedTodo.createdOn) }}</p>
-              </div>
-
-              <div class="mt-2">
-                <label class="label">
-                  <span class="label-text">Updated On</span>
-                </label>
-                <p>{{ formatDate(selectedTodo.updatedOn) }}</p>
+                <p class="mt-1 text-xl font-semibold text-gray-900">
+                  {{ formatDate(selectedTodo.updatedOn) }}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="sm:flex justify-end">
+        <div
+          class="bg-grey-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t mt-3"
+        >
           <button
             @click="closeModalWithEdit"
             type="button"
-            class="btn btn-primary ml-2 bg-white"
+            class="btn btn-outline btn-success ml-2 sm:ml-4"
           >
             Save
           </button>
           <button
             @click="closeModal"
             type="button"
-            class="btn btn-outline btn-secondary bg-white" 
+            class="btn btn-outline btn-error"
           >
             Close
           </button>
@@ -226,3 +243,18 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.label {
+  @apply text-white rounded-md px-3 py-1 inline-block mb-2;
+}
+
+.label-text {
+  @apply font-semibold;
+}
+
+.unassigned-style {
+  background-color: #f0f0f0; /* Light grey background */
+  color: #ccc; /* Grey text */
+}
+</style>
