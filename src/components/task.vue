@@ -56,7 +56,11 @@ const confirmDelete = async () => {
   showDeleteModal.value = false;
 };
 const openDeleteModal = (id) => {
-  selectedDeletedTodo.value = todos.value.find((todo) => todo.id === id);
+  const todoIndex = todos.value.findIndex((todo) => todo.id === id);
+  selectedDeletedTodo.value = {
+    ...todos.value[todoIndex],
+    count: todoIndex + 1
+  };
   showDeleteModal.value = true;
   nextTick(() => {
     deleteButton.value.focus();
@@ -187,41 +191,54 @@ onMounted(() => {
 
     <!-- delete modal -->
     <div
-      v-if="showDeleteModal"
-      class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
-    >
-      <div
-        class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
-      >
-        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div class="sm:flex sm:items-start">
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Are you sure you want to delete this task?
-              </h3>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button
-            @click="confirmDelete"
-            @keyup="confirmDelete"
-            ref="deleteButton"
-            type="button"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-          >
-            Delete
-          </button>
-          <button
-            @click="showDeleteModal = false"
-            type="button"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-          >
-            Cancel
-          </button>
-        </div>
+  v-if="showDeleteModal"
+  class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
+>
+  <div
+    class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+  >
+    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+      <div class="flex flex-col items-center justify-center text-center">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Are you sure you want to delete task number {{ selectedDeletedTodo.count }}
+        </h3>
+        <h3
+          class="text-lg leading-6 font-medium text-gray-900 truncate-title"
+        >
+        
+          
+          {{ selectedDeletedTodo.title }}
+        </h3>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          tasks?
+        </h3>
       </div>
     </div>
+
+    <div
+      class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-center sm:flex-row-reverse overflow-auto"
+    >
+      <button
+        @click="confirmDelete"
+        @keyup.enter="confirmDelete"
+        ref="deleteButton"
+        type="button"
+        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+      >
+        Delete
+      </button>
+      <button
+        @click="showDeleteModal = false"
+        type="button"
+        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+    
   </div>
 </template>
 
@@ -230,8 +247,8 @@ onMounted(() => {
 .status-to-do,
 .status-doing,
 .status-done {
-  border-style: solid; /* This makes the border visible */
-  border-width: 1px; /* Adjust the width as needed */
+  border-style: solid;
+  border-width: 1px;
 }
 
 .status-no-status {
@@ -251,5 +268,18 @@ onMounted(() => {
 .status-done {
   border-color: green;
   color: green;
+}
+
+.long-title {
+  word-wrap: break-word;
+  max-width: 90%;
+}
+
+.truncate-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+  display: block;
 }
 </style>
