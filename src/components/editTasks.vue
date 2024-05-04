@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, computed } from "vue";
 import { watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -11,6 +11,7 @@ const route = useRoute();
 const router = useRouter();
 let errorMessage = ref("");
 let assigneesText = ref("");
+let descriptionText = ref("");
 
 const fetchDataById = async (id) => {
   try {
@@ -119,7 +120,6 @@ const formatStatus = (status) => {
 };
 
 
-
 onMounted(() => {
   fetchDataById(route.params.id);
 });
@@ -153,13 +153,11 @@ onMounted(() => {
                 <span class="label-text text-2xl">Description</span>
               </label>
               <textarea
-                v-model="selectedTodo.description"
-                :placeholder="selectedTodo.description ? '' : 'Unassigned'"
+                v-model="descriptionText"
+                :placeholder="assigneesText ? '' : 'Unassigned'"
                 class="textarea textarea-bordered w-full h-32 bg-gray-500 rounded-lg textarea-md text-white text-lg"
               ></textarea>
             </div>
-
-
 
             <div class="mt-2 bg-gray-500 rounded-md">
               <label for="status" class="label">
@@ -192,11 +190,11 @@ onMounted(() => {
                 <span class="label-text text-xl">Assignees</span>
               </label>
               <input
-  id="assignees"
-  v-model="assigneesText"
-  class="input input-bordered w-full"
-  :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
-/>
+                id="assignees"
+                v-model="assigneesText"
+                class="input input-bordered w-full"
+                :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
+              />
             </div>
 
             <div class="mt-3 p-3 bg-gray-400 rounded-lg shadow">
