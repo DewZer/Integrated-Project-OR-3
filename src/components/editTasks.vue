@@ -15,7 +15,11 @@ let descriptionText = ref("");
 
 const fetchDataById = async (id) => {
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`);
+    const response = await fetch(
+      `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`);
+      
+      // `http://localhost:8080/itb-kk/v1/tasks/${id}`);
+
     if (!response.ok) {
       throw new Error("No task found with this ID");
     }
@@ -32,7 +36,18 @@ const fetchDataById = async (id) => {
 };
 
 const closeModalWithEdit = async () => {
-  if (!selectedTodo.value.title.trim()) {
+  // trim 
+  selectedTodo.value.title = selectedTodo.value.title.trim();
+
+
+  if (selectedTodo.value.description) {
+    selectedTodo.value.description = selectedTodo.value.description.trim();
+  }
+  if (assigneesText.value) {
+    assigneesText.value = assigneesText.value.trim();
+  }
+
+  if (!selectedTodo.value.title) {
     errorMessage.value = "Title is required";
     return;
   }
@@ -41,13 +56,21 @@ const closeModalWithEdit = async () => {
 
   todoToUpdate.assignees = assigneesText.value;
 
-  if (!todoToUpdate.assignees || !todoToUpdate.assignees.trim()) {
+  if (!todoToUpdate.assignees) {
     delete todoToUpdate.assignees;
   }
 
+
+  delete todoToUpdate.createdOn;
+  delete todoToUpdate.updatedOn;
+
   try {
     const response = await fetch(
+
       `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${todoToUpdate.id}`,
+
+      // `http://localhost:8080/itb-kk/v1/tasks/${todoToUpdate.id}`,
+
       {
         method: "PUT",
         headers: {
@@ -61,7 +84,7 @@ const closeModalWithEdit = async () => {
     }
     toast.success("The task has been updated");
     showEditModal.value = false;
-    await fetchDataById(todoToUpdate.id); // fetch the task again after it's updated
+    await fetchDataById(todoToUpdate.id);
     router.push({ path: "/task" });
   } catch (error) {
     console.error("Error:", error);
@@ -102,6 +125,7 @@ const formatDate = (dateString) => {
     minute: "2-digit",
     second: "2-digit",
     hourCycle: "h23",
+    
   };
   return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
@@ -118,7 +142,6 @@ const formatStatus = (status) => {
       return `Done`;
   }
 };
-
 
 onMounted(() => {
   fetchDataById(route.params.id);
@@ -153,9 +176,17 @@ onMounted(() => {
                 <span class="label-text text-2xl">Description</span>
               </label>
               <textarea
-                v-model="descriptionText"
-                :placeholder="assigneesText ? '' : 'Unassigned'"
-                class="textarea textarea-bordered w-full h-32 bg-gray-500 rounded-lg textarea-md text-white text-lg"
+                v-model="selectedTodo.description"
+                :placeholder="
+                  selectedTodo.description ? '' : 'No description provided'
+                "
+                :class="[
+                  'textarea textarea-bordered w-full h-32 rounded-lg textarea-md text-lg',
+                  {
+                    'bg-gray-500 text-white': selectedTodo.description,
+                    'bg-gray-200 text-black': !selectedTodo.description,
+                  },
+                ]"
               ></textarea>
             </div>
 
@@ -194,6 +225,7 @@ onMounted(() => {
                 v-model="assigneesText"
                 class="input input-bordered w-full"
                 :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
+                :class="{ 'italic': !assigneesText }"
               />
             </div>
 
