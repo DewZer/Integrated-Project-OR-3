@@ -52,6 +52,7 @@ const addTodo = async () => {
   }
 
   try {
+    // const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
     const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -64,7 +65,9 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
-    const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
+    // const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
+      const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
