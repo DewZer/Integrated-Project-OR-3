@@ -85,7 +85,7 @@ const closeModalWithEdit = async () => {
     toast.success("The task has been updated");
     showEditModal.value = false;
     await fetchDataById(todoToUpdate.id);
-    router.push({ path: "/task" });
+    router.push({ path: "/tasks" });
   } catch (error) {
     console.error("Error:", error);
     toast.error("The update was unsuccessful");
