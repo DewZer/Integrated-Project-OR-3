@@ -17,7 +17,7 @@ const fetchDataById = async (id) => {
   try {
     const response = await fetch(
       `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`);
-      
+        
       // `http://localhost:8080/itb-kk/v1/tasks/${id}`);
 
     if (!response.ok) {
@@ -31,7 +31,7 @@ const fetchDataById = async (id) => {
   } catch (error) {
     console.error("Error:", error);
     alert("No task found with this ID");
-    router.push({ path: "/task" });
+    router.push({ path: "/tasks" });
   }
 };
 
@@ -257,14 +257,14 @@ onMounted(() => {
           <button
             @click="closeModalWithEdit"
             type="button"
-            class="btn btn-outline btn-success ml-2 sm:ml-4"
+            class=" btn btn-outline btn-success ml-2 sm:ml-4"
           >
             Save
           </button>
           <button
             @click="closeModal"
             type="button"
-            class="btn btn-outline btn-error"
+            class="itbkk-button-cancel btn btn-outline btn-error"
           >
             Close
           </button>

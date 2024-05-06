@@ -2,7 +2,7 @@ import './assets/main.css'
 import 'flowbite/dist/flowbite.min.css';
 import 'flowbite/dist/flowbite.min.js';
 import { createRouter, createWebHistory } from 'vue-router'
-import task from './components/task.vue'
+import task from './components/tasks.vue'
 import { createApp } from 'vue'
 import App from './App.vue'
 import editTasks from './components/editTasks.vue'
