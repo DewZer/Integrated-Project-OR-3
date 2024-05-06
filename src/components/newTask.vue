@@ -22,7 +22,7 @@ const closeModal = () => {
 };
 
 const goToTasks = () => {
-  router.push("/task");
+  router.push("/tasks");
 };
 
 const formatStatus = (status) => {
@@ -65,8 +65,8 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
-    const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
-      // const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
+    // const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
+      const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
 
       method: "POST",
       headers: {
