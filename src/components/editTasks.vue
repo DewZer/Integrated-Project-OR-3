@@ -31,7 +31,7 @@ const fetchDataById = async (id) => {
   } catch (error) {
     console.error("Error:", error);
     alert("No task found with this ID");
-    router.push({ path: "/tasks" });
+    router.push({ path: "/task" });
   }
 };
 
@@ -85,7 +85,7 @@ const closeModalWithEdit = async () => {
     toast.success("The task has been updated");
     showEditModal.value = false;
     await fetchDataById(todoToUpdate.id);
-    router.push({ path: "/tasks" });
+    router.push({ path: "/task" });
   } catch (error) {
     console.error("Error:", error);
     toast.error("The update was unsuccessful");

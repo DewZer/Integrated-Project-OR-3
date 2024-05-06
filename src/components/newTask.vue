@@ -22,7 +22,7 @@ const closeModal = () => {
 };
 
 const goToTasks = () => {
-  router.push("/tasks");
+  router.push("/task");
 };
 
 const formatStatus = (status) => {
@@ -90,7 +90,7 @@ const addTodo = async () => {
       assignees: "",
       status: "NO_STATUS",
     };
-    router.push("/tasks");
+    router.push("/task");
   } catch (error) {
     console.error("Error:", error);
   }

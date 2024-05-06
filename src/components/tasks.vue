@@ -12,7 +12,7 @@ const deleteButton = ref(null);
 const toast = useToast();
 
 const goToEdit = (id) => {
-  router.push({ path: `/tasks/${id}` });
+  router.push({ path: `/task/${id}` });
 };
 
 const fetchTodos = async () => {
@@ -72,7 +72,7 @@ const openDeleteModal = (id) => {
 };
 
 const gotoAdd = () => {
-  router.push({ path: "/tasks/add" });
+  router.push({ path: "/task/add" });
 };
 
 const formatStatus = (status) => {
