@@ -12,11 +12,11 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
 const routes = [
-  { path: '/tasks', component: tasks },
-  { path: '/', redirect: '/tasks' },
-  { path: '/:pathMatch(.*)*', redirect: '/tasks' },
-  { path: '/tasks/:id', component: editTasks, props: true, name: 'editTasks' },
-  { path: '/tasks/add', component: newTask, props: true, name: 'newTask' }
+  { path: '/task', component: tasks },
+  { path: '/', redirect: '/task' },
+  { path: '/:pathMatch(.*)*', redirect: '/task' },
+  { path: '/task/:id', component: editTasks, props: true, name: 'editTasks' },
+  { path: '/task/add', component: newTask, props: true, name: 'newTask' }
 ]
 
 const router = createRouter({
