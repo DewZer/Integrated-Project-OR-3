@@ -65,8 +65,8 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
-    // const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
-      const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
+    const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
+      // const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
 
       method: "POST",
       headers: {
@@ -90,7 +90,7 @@ const addTodo = async () => {
       assignees: "",
       status: "NO_STATUS",
     };
-    router.push("/task");
+    router.push("/tasks");
   } catch (error) {
     console.error("Error:", error);
   }
@@ -178,19 +178,21 @@ const emit = defineEmits(["task-added"]);
       </div>
       <div class="bg-grey-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
         <button
+          @click="addTodo"
+          type="button"
+          class="itbkk-button-confirm btn btn-outline btn-success btn-lg ml-2 sm:ml-4"
+          :disabled="!newTodo.title.trim()"
+        >
+          save
+        </button>
+        <button
           @click="closeModal"
           type="button"
-          class="btn btn-outline btn-error btn-lg"
+          class="itbkk-button-cancel btn btn-outline btn-error btn-lg"
         >
           Close
         </button>
-        <button
-          @click="addTodo"
-          type="button"
-          class="btn btn-outline btn-success btn-lg ml-2 sm:ml-4"
-        >
-          Save
-        </button>
+        
       </div>
     </div>
   </div>

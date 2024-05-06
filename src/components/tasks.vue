@@ -12,14 +12,15 @@ const deleteButton = ref(null);
 const toast = useToast();
 
 const goToEdit = (id) => {
-  router.push({ path: `/task/${id}` });
+  router.push({ path: `/tasks/${id}` });
 };
 
 const fetchTodos = async () => {
   try {
     const response = await fetch(
-      "http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks");
-      // "http://localhost:8080/itb-kk/v1/tasks");
+      "http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks"
+      // "http://localhost:8080/itb-kk/v1/tasks"
+    );
     const data = await response.json();
     todos.value = data.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
@@ -62,7 +63,7 @@ const openDeleteModal = (id) => {
   const todoIndex = todos.value.findIndex((todo) => todo.id === id);
   selectedDeletedTodo.value = {
     ...todos.value[todoIndex],
-    count: todoIndex + 1
+    count: todoIndex + 1,
   };
   showDeleteModal.value = true;
   nextTick(() => {
@@ -71,7 +72,7 @@ const openDeleteModal = (id) => {
 };
 
 const gotoAdd = () => {
-  router.push({ path: "/task/add" });
+  router.push({ path: "/tasks/add" });
 };
 
 const formatStatus = (status) => {
@@ -93,8 +94,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto pt-4 px-4 py-16">
-    <!-- Header -->
+  <div class="container mx-auto pt-4 px-4 py-16 flex flex-col items-center justify-center min-h-screen">
+
     <div class="flex justify-center w-full mb-7 relative">
       <span class="text-2xl md:text-3xl font-bold mb-3">
         ITBKK-Kradan Kanban
@@ -108,13 +109,13 @@ onMounted(() => {
       <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
         <thead class="bg-gray-200 w-full">
           <tr>
-            <th class="w-1/3 text-black">Title</th>
-            <th class="w-1/4 text-black">Assignees</th>
-            <th class="w-1/4 text-black">Status</th>
-            <th class="1/3">
+            <th class="w-1/3 text-black text-center">Title</th>
+            <th class="w-1/4 text-black text-center">Assignees</th>
+            <th class="w-1/4 text-black text-center">Status</th>
+            <th class="1/3 text-center">
               <button
                 @click="gotoAdd"
-                class="btn btn-outline btn-success bg-green-200 btn-lg"
+                class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-lg"
               >
                 Add Task
               </button>
@@ -172,7 +173,7 @@ onMounted(() => {
             >
               <button
                 @click="openDeleteModal(todo.id)"
-                class="text-red-600 hover:text-red-900"
+                class="itbkk-button-action text-red-600 hover:text-red-900"
               >
                 Delete
               </button>
@@ -194,54 +195,49 @@ onMounted(() => {
 
     <!-- delete modal -->
     <div
-  v-if="showDeleteModal"
-  class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
->
-  <div
-    class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
-  >
-    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-      <div class="flex flex-col items-center justify-center text-center">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Are you sure you want to delete task number {{ selectedDeletedTodo.count }}
-        </h3>
-        <h3
-          class="text-lg leading-6 font-medium text-gray-900 truncate-title"
+      v-if="showDeleteModal"
+      class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
+    >
+      <div
+        class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+      >
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="flex flex-col items-center justify-center text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Do you want to delete the task number
+              {{ selectedDeletedTodo.count }}
+            </h3>
+            <h3
+              class="text-lg leading-6 font-medium text-gray-900 truncate-title"
+            >
+              {{ selectedDeletedTodo.title }}
+            </h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">tasks?</h3>
+          </div>
+        </div>
+
+        <div
+          class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-center sm:flex-row-reverse overflow-auto"
         >
-        
-          
-          {{ selectedDeletedTodo.title }}
-        </h3>
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          tasks?
-        </h3>
+          <button
+            @click="confirmDelete"
+            @keyup.enter="confirmDelete"
+            ref="deleteButton"
+            type="button"
+            class="itbkk-button-delete w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Delete
+          </button>
+          <button
+            @click="showDeleteModal = false"
+            type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
-
-    <div
-      class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-center sm:flex-row-reverse overflow-auto"
-    >
-      <button
-        @click="confirmDelete"
-        @keyup.enter="confirmDelete"
-        ref="deleteButton"
-        type="button"
-        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-      >
-        Delete
-      </button>
-      <button
-        @click="showDeleteModal = false"
-        type="button"
-        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-</div>
-
-    
   </div>
 </template>
 
