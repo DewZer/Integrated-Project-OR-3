@@ -12,19 +12,19 @@ const deleteButton = ref(null);
 const toast = useToast();
 
 const goToEdit = (id) => {
+  router.push({ path: `/task/${id}/edit` });
+};
+
+const goToView = (id) => {
   router.push({ path: `/task/${id}` });
 };
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch(
-      "http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks"
-      // "http://localhost:8080/itb-kk/v1/tasks"
-    );
+    "http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks"
+    // const response = await fetch("http://localhost:8080/v1/tasks");
     const data = await response.json();
-    todos.value = data.sort(
-      (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
-    );
+    todos.value = data.sort((a, b) => a.id - b.id);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -34,7 +34,7 @@ const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
       `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`,
-      // `http://localhost:8080/itb-kk/v1/tasks/${id}`,
+      // `http://localhost:8080/v1/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -94,8 +94,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto pt-4 px-4 py-16 flex flex-col items-center justify-center min-h-screen">
-
+  <div class="w-full flex flex-col items-start h-screen bg-slate-400">
     <div class="flex justify-center w-full mb-7 relative">
       <span class="text-2xl md:text-3xl font-bold mb-3">
         ITBKK-Kradan Kanban
@@ -105,7 +104,7 @@ onMounted(() => {
       ></span>
     </div>
 
-    <div>
+    <div class="w-full">
       <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
         <thead class="bg-gray-200 w-full">
           <tr>
@@ -143,7 +142,7 @@ onMounted(() => {
           >
             <td
               class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
-              @click="goToEdit(todo.id)"
+              @click="goToView(todo.id)"
             >
               <div class="truncate text-md font-bold" :title="todo.title">
                 {{ todo.title }}
@@ -239,6 +238,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
 </template>
 
 <style>
