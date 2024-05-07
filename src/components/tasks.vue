@@ -21,7 +21,7 @@ const goToView = (id) => {
 
 const fetchTodos = async () => {
   try {
-
+    
     const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
