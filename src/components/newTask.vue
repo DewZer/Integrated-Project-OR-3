@@ -21,9 +21,6 @@ const closeModal = () => {
   router.push("/task");
 };
 
-const goToTasks = () => {
-  router.push("/task");
-};
 
 const formatStatus = (status) => {
   switch (status) {
@@ -52,7 +49,7 @@ const addTodo = async () => {
   }
 
   try {
-    // const response = await fetch("http://localhost:8080/itb-kk/v1/tasks");
+    // const response = await fetch("http://localhost:8080/v1/tasks");
     const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -65,8 +62,8 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
-    // const response2 = await fetch("http://localhost:8080/itb-kk/v1/tasks", {
-      const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
+    const response2 = await fetch("http://localhost:8080/v1/tasks", {
+      // const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks", {
 
       method: "POST",
       headers: {
@@ -74,7 +71,7 @@ const addTodo = async () => {
       },
       body: JSON.stringify(todo),
     });
-    if (response2.status === 200) {
+    if (response2.status === 201) {
       toast.success("Task added successfully");
     } else {
       throw new Error(`HTTP error! status: ${response2.status}`);
@@ -102,68 +99,45 @@ const emit = defineEmits(["task-added"]);
 <template>
   <div
     v-if="showAddModal"
-    class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center"
+    class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500"
   >
     <div
-      class="bg-gray-800 rounded-lg text-white text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-70% flex flex-col"
-      style="min-width: 80%; max-width: 100%; height: 80%; overflow: auto"
+      class="bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-70% flex flex-col p-6 overflow-y-auto max-h-screen"
+      style="min-width: 50%"
     >
       <div class="bg-grey sm:p-6 sm:pb-4 flex-grow">
-        <div class="sm:flex sm:items-start flex">
+        <div class="sm:flex flex">
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
-            <!-- Title -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text text-white text-xl">Title</span>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              <label for="title" class="label">
+                <span class="label-text text-2xl font-bold text-pink-400">Title</span>
               </label>
               <input
                 type="text"
                 v-model="newTodo.title"
+                class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                 placeholder="Title"
-                class="input input-bordered w-full bg-gray-600 rounded-md gap-2"
               />
-            </div>
+            </h3>
 
-            <!-- Error message -->
-            <p class="text-red-500 text-xs italic" v-if="errorMessage">
-              {{ errorMessage }}
-            </p>
-
-            <!-- Description  -->
-            <div class="form-control mt-4">
-              <label class="label">
-                <span class="label-text text-white text-xl">Description</span>
-                <span class="badge badge-info">Optional</span>
+            <div class="mt-2">
+              <label for="description" class="label">
+                <span class="label-text text-2xl text-green-400 font-bold">Description</span>
               </label>
               <textarea
                 v-model="newTodo.description"
                 placeholder="Description"
-                class="textarea textarea-bordered h-24 w-full"
+                class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200"
               ></textarea>
             </div>
 
-            <!-- Assignees  -->
-            <div class="form-control mt-4">
-              <label class="label">
-                <span class="label-text text-white text-xl">Assignees</span>
-                <span class="badge badge-info">Optional</span>
-              </label>
-              <input
-                type="text"
-                v-model="newTodo.assignees"
-                placeholder="Assignees"
-                class="input input-bordered w-full bg-gray-600"
-              />
-            </div>
-
-            <!-- Status  -->
-            <div class="form-control mt-4">
-              <label class="label">
-                <span class="label-text text-white text-xl">Status</span>
+            <div class="mt-2">
+              <label for="status" class="label">
+                <span class="label-text text-lg font-bold text-yellow-400">Status</span>
               </label>
               <select
                 v-model="newTodo.status"
-                class="select select-bordered w-full"
+                class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
               >
                 <option
                   v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
@@ -173,26 +147,40 @@ const emit = defineEmits(["task-added"]);
                 </option>
               </select>
             </div>
+
+            <div class="mt-2">
+              <label for="assignees" class="label">
+                <span class="label-text text-xl font-bold text-blue-200">Assignees</span>
+              </label>
+              <input
+                type="text"
+                v-model="newTodo.assignees"
+                class="input input-bordered w-full bg-gray-200"
+                placeholder="Assignees"
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div class="bg-grey-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-        <button
-          @click="addTodo"
-          type="button"
-          class="itbkk-button-confirm btn btn-outline btn-success btn-lg ml-2 sm:ml-4"
-          :disabled="!newTodo.title.trim()"
+
+        <div
+          class="bg-grey-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t mt-3"
         >
-          save
-        </button>
-        <button
-          @click="closeModal"
-          type="button"
-          class="itbkk-button-cancel btn btn-outline btn-error btn-lg"
-        >
-          Close
-        </button>
-        
+          <button
+            @click="addTodo"
+            type="button"
+            class="btn btn-outline btn-success ml-2 sm:ml-4"
+            :disabled="!newTodo.title.trim()"
+          >
+            Save
+          </button>
+          <button
+            @click="closeModal"
+            type="button"
+            class="btn btn-outline btn-error"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   </div>
