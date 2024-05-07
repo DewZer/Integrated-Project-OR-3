@@ -21,8 +21,8 @@ const goToView = (id) => {
 
 const fetchTodos = async () => {
   try {
-    "http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks"
-    // const response = await fetch("http://localhost:8080/v1/tasks");
+
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
   } catch (error) {
@@ -33,7 +33,7 @@ const fetchTodos = async () => {
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`,
       // `http://localhost:8080/v1/tasks/${id}`,
       {
         method: "DELETE",
