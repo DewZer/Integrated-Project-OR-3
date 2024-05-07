@@ -9,7 +9,7 @@ const showViewModal = ref(false);
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
-
+const assigneesText = ref("");
 
 const fetchDataById = async (id) => {
   try {
