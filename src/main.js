@@ -19,12 +19,12 @@ const routes = [
   { path: '/task', component: tasks },
   { path: '/', redirect: '/task' },
   { path: '/:pathMatch(.*)*', redirect: '/task' },
-  { path: '/task/:id', component: viewTask, props: true, name: 'viewTask' },
-  { path: '/task/add', component: newTask, props: true, name: 'newTask' },
-  { path: '/task/:id/edit', component: editTasks, props: true, name: 'editTask' },
-  { path: '/task/status', component: ManageStatus, props: true, name: 'ManageStatus' },
-  { path: '/task/status/add', component: addStatus, props: true, name: 'addStatus' },
-  { path: '/task/status/:id', component: editStatus, props: true, name: 'editStatus' },
+  { path: '/task/:id', component: viewTask, props: true, name: 'view-task' },
+  { path: '/task/add', component: newTask, props: true, name: 'new-task' },
+  { path: '/task/:id/edit', component: editTasks, props: true, name: 'edit-task' },
+  { path: '/task/status', component: ManageStatus, props: true, name: 'manage-status' },
+  { path: '/task/status/add', component: addStatus, props: true, name: 'add-status' },
+  { path: '/task/status/:id', component: editStatus, props: true, name: 'edit-status' },
 
 ]
 
@@ -33,7 +33,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
-
+router.beforeEach((to, from, next) => {
+  document.title = to.name || 'ITBKK-Kradan Kanban';
+  next();
+});
 
 createApp(App)
   .use(router)

@@ -64,7 +64,7 @@ const confirmTransfer = async () => {
   try {
     await deleteStatus(selectedDeletedStatus.value.id, newStatus.value);
     showTransferModal.value = false;
-    showDeleteModal.value = false; // add this line
+    showDeleteModal.value = false;
     selectedDeletedStatus.value = null;
     await fetchStatuses();
   } catch (error) {
