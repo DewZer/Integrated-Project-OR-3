@@ -1,46 +1,23 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import {  useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 let statuses = ref([]);
 const showDeleteModal = ref(false);
-let selectedDeletedStatus = ref(null)
+let selectedDeletedStatus = ref(null);
 
 const openDeleteModal = (status) => {
   selectedDeletedStatus.value = status;
   showDeleteModal.value = true;
 };
 
-
 let showTransferModal = ref(false);
 let newStatus = ref(null);
-
-
-const confirmTransfer = async () => {
-  // Fetch all tasks with the status being deleted
-  const tasks = await fetchTasksByStatus(selectedDeletedStatus.value.id);
-
-  // For each task, update its status to the new status
-  for (let task of tasks) {
-    await updateTaskStatus(task.id, newStatus.value);
-  }
-
-  // After all tasks have been transferred, delete the old status
-  await deleteStatus(selectedDeletedStatus.value.id);
-
-  // Close the transfer modal
-  showTransferModal.value = false;
-
-  // Refresh the list of statuses
-  statuses.value = await fetchStatuses();
-};
 
 const goBack = () => {
   router.push({ path: `/task` });
 };
-
-
 
 const gotoAddStatus = () => {
   router.push({ path: "/task/status/add" });
@@ -50,61 +27,62 @@ const gotoEditStatus = (status) => {
   router.push({ path: `/task/status/${status.id}` });
 };
 
-
-
 const confirmDelete = async () => {
   try {
-    // Fetch all tasks
     const tasks = await fetchTasksByStatus(selectedDeletedStatus.value.id);
-
-    // Check if any task uses the status being deleted
     const isStatusInUse = tasks.length > 0;
+    console.log(fetchTasksByStatus(selectedDeletedStatus.value.id));
 
     if (isStatusInUse) {
-      // If the status is in use, open the transfer modal
       showTransferModal.value = true;
     } else {
-      // If the status is not in use, proceed with deletion
       await deleteStatus(selectedDeletedStatus.value.id);
-
-      // Close the modal
       showDeleteModal.value = false;
+      showTransferModal.value = false;
+      await fetchStatuses();
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
+  }
+};
+
+const deleteStatus = async (statusId, newStatusId) => {
+  let url = `http://localhost:8080/v2/statuses/${statusId}`;
+  if (newStatusId) {
+    url += `/${newStatusId}`;
+  }
+
+  const response = await fetch(url, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete status");
+  }
+};
+
+const confirmTransfer = async () => {
+  try {
+    await deleteStatus(selectedDeletedStatus.value.id, newStatus.value);
+    showTransferModal.value = false;
+    showDeleteModal.value = false; // add this line
+    selectedDeletedStatus.value = null;
+    await fetchStatuses();
+  } catch (error) {
+    console.error("Error:", error);
   }
 };
 const fetchTasksByStatus = async (statusId) => {
-  const response = await fetch(`http://localhost:8080/v2/tasks?statusId=${statusId}`);
+  const response = await fetch(
+    `http://localhost:8080/v2/tasks?statusId=${statusId}`
+  );
   if (!response.ok) {
-    throw new Error('Failed to fetch tasks');
+    throw new Error("Failed to fetch tasks");
   }
-  return await response.json();
+  const tasks = await response.json();
+  return tasks.filter(task => task.statusName === selectedDeletedStatus.value.name);
 };
 
-const updateTaskStatus = async (taskId) => {
-  const response = await fetch(`http://localhost:8080/v2/tasks/${taskId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ statusId: newStatus, name: name }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to update task status');
-  }
-};
-
-const deleteStatus = async (statusId) => {
-  const response = await fetch(`http://localhost:8080/v2/statuses/${statusId}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to delete status');
-  }
-};
-
-onMounted(async () => {
+const fetchStatuses = async () => {
   try {
     const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
@@ -115,17 +93,22 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error:", error);
   }
+};
+
+onMounted(async () => {
+  await fetchStatuses();
+  const noStatus = statuses.value.find(status => status.name === 'No Status');
+  if (noStatus) {
+    newStatus.value = noStatus.id;
+  }
 });
-
-
-
 </script>
-
 <template>
   <div class="w-full flex flex-col items-start h-screen bg-slate-400">
     <div class="flex justify-between w-full mb-7 relative px-4">
       <div>
-        <button @click="goBack" class="btn btn-accent mt-4">Back</button>      </div>
+        <button @click="goBack" class="btn btn-accent mt-4">Back</button>
+      </div>
       <div class="flex justify-center w-full">
         <span class="text-2xl md:text-3xl font-bold mb-3 text-black pt-4">
           ITBKK-Kradan Kanban
@@ -164,6 +147,7 @@ onMounted(async () => {
             <td class="text-center">{{ status.statusDescription }}</td>
             <td class="text-center">
               <button
+                v-if="status.name !== 'No Status'"
                 @click="gotoEditStatus(status)"
                 class="itbkk-button-edit btn btn-outline btn-primary bg-blue-200 btn-md"
               >
@@ -172,6 +156,7 @@ onMounted(async () => {
             </td>
             <td class="text-center">
               <button
+                v-if="status.name !== 'No Status'"
                 @click="openDeleteModal(status)"
                 class="itbkk-button-delete btn btn-outline btn-danger bg-red-200 btn-md"
               >
@@ -207,8 +192,14 @@ onMounted(async () => {
             class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-center sm:flex-row-reverse overflow-auto"
           >
             <button
-              @click="confirmDelete"
-              @keyup.enter="confirmDelete"
+              @click="
+                confirmDelete();
+                showDeleteModal = false;
+              "
+              @keyup.enter="
+                confirmDelete();
+                showDeleteModal = false;
+              "
               ref="deleteButton"
               type="button"
               class="itbkk-button-delete w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
@@ -227,47 +218,50 @@ onMounted(async () => {
       </div>
 
       <div
-    v-if="showTransferModal"
-    class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
-  >
-    <div
-      class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
-    >
-      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-        <div class="flex flex-col items-center justify-center text-center">
-          <h3 class="text-lg leading-6 font-medium text-gray-900">
-            The status "{{ selectedDeletedStatus.name }}" is currently in use by a task. Please select a new status for these tasks.
-          </h3>
-          <select v-model="newStatus" class="mt-4">
-            <option v-for="status in statuses" :value="status.id" :key="status.id">
-              {{ status.name }}
-            </option>
-          </select>
+        v-if="showTransferModal"
+        class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
+      >
+        <div
+          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+        >
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="flex flex-col items-center justify-center text-center">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">
+                The status "{{ selectedDeletedStatus.name }}" is currently in
+                use by a task. Please select a new status for these tasks.
+              </h3>
+              <select v-model="newStatus" class="mt-4">
+                <option
+                  v-for="status in statuses"
+                  :value="status.id"
+                  :key="status.id"
+                >
+                  {{ status.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-center sm:flex-row-reverse overflow-auto"
+          >
+            <button
+              @click="confirmTransfer"
+              type="button"
+              class="itbkk-button-delete w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Transfer and Delete
+            </button>
+            <button
+              @click="showTransferModal = false"
+              type="button"
+              class="itbkk-button-cancel w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
-
-      <div
-        class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-center sm:flex-row-reverse overflow-auto"
-      >
-        <button
-          @click="confirmTransfer"
-          type="button"
-          class="itbkk-button-delete w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-        >
-          Transfer and Delete
-        </button>
-        <button
-          @click="showTransferModal = false"
-          type="button"
-          class="itbkk-button-cancel w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-
-
     </div>
   </div>
 </template>
