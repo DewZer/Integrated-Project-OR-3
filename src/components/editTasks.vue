@@ -13,14 +13,31 @@ let errorMessage = ref("");
 let assigneesText = ref("");
 const originalTodo = ref(null);
 const isSaveButtonDisabled = ref(true);
+const statuses = ref([]);
 
+const fetchStatuses = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/v2/statuses`);
+    console.log("fetching statuses");
+    if (!response.ok) {
+      throw new Error("Failed to fetch statuses");
+    }
+
+    const data = await response.json();
+    statuses.value = data.map((status) => status.name);
+    console.log(statuses.value);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`);
-        
-      // `http://localhost:8080/v1/tasks/${id}`);
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`);
+
+      `http://localhost:8080/v2/tasks/${id}`
+    );
 
     if (!response.ok) {
       throw new Error("No task found with this ID");
@@ -35,13 +52,12 @@ const fetchDataById = async (id) => {
     console.error("Error:", error);
     alert("No task found with this ID");
     router.push({ path: "/task" });
-  } 
+  }
 };
 
 const closeModalWithEdit = async () => {
-  // trim 
+  // trim
   selectedTodo.value.title = selectedTodo.value.title.trim();
-
 
   if (selectedTodo.value.description) {
     selectedTodo.value.description = selectedTodo.value.description.trim();
@@ -63,16 +79,14 @@ const closeModalWithEdit = async () => {
     delete todoToUpdate.assignees;
   }
 
-
   delete todoToUpdate.createdOn;
   delete todoToUpdate.updatedOn;
 
   try {
     const response = await fetch(
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${todoToUpdate.id}`,
 
-      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${todoToUpdate.id}`,
-
-      // `http://localhost:8080/v1/tasks/${todoToUpdate.id}`,
+      `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
 
       {
         method: "PUT",
@@ -125,7 +139,7 @@ function deepEqual(a, b) {
   if (a instanceof Date && b instanceof Date)
     return a.getTime() === b.getTime();
 
-  if (!a || !b || (typeof a !== 'object' && typeof b !== 'object'))
+  if (!a || !b || (typeof a !== "object" && typeof b !== "object"))
     return a === b;
 
   if (a.prototype !== b.prototype) return false;
@@ -133,13 +147,19 @@ function deepEqual(a, b) {
   let keys = Object.keys(a);
   if (keys.length !== Object.keys(b).length) return false;
 
-  return keys.every(k => deepEqual(a[k], b[k]));
+  return keys.every((k) => deepEqual(a[k], b[k]));
 }
 
-watch([selectedTodo, assigneesText], () => {
-  isSaveButtonDisabled.value = !selectedTodo.value.title.trim() || (deepEqual(selectedTodo.value, originalTodo.value) && assigneesText.value === originalTodo.value.assignees);
-}, { deep: true });
-
+watch(
+  [selectedTodo, assigneesText],
+  () => {
+    isSaveButtonDisabled.value =
+      !selectedTodo.value.title.trim() ||
+      (deepEqual(selectedTodo.value, originalTodo.value) &&
+        assigneesText.value === originalTodo.value.assignees);
+  },
+  { deep: true }
+);
 
 const formatDate = (dateString) => {
   const options = {
@@ -150,25 +170,12 @@ const formatDate = (dateString) => {
     minute: "2-digit",
     second: "2-digit",
     hourCycle: "h23",
-    
   };
   return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
 
-const formatStatus = (status) => {
-  switch (status) {
-    case "NO_STATUS":
-      return "No Status";
-    case "TO_DO":
-      return `To Do`;
-    case "DOING":
-      return `Doing`;
-    case "DONE":
-      return `Done`;
-  }
-};
-
-onMounted(() => {
+onMounted(async () => {
+  await fetchStatuses();
   fetchDataById(route.params.id);
 });
 </script>
@@ -187,7 +194,9 @@ onMounted(() => {
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
               <label for="title" class="label">
-                <span class="label-text text-2xl font-bold text-pink-400">Title</span>
+                <span class="label-text text-2xl font-bold text-pink-400"
+                  >Title</span
+                >
               </label>
               <input
                 type="text"
@@ -198,7 +207,9 @@ onMounted(() => {
 
             <div class="mt-2">
               <label for="description" class="label">
-                <span class="label-text text-2xl text-green-400 font-bold">Description</span>
+                <span class="label-text text-2xl text-green-400 font-bold"
+                  >Description</span
+                >
               </label>
               <textarea
                 v-model="selectedTodo.description"
@@ -225,25 +236,27 @@ onMounted(() => {
 
             <div class="mt-2">
               <label for="status" class="label">
-                <span class="label-text text-lg font-bold text-yellow-400">Status</span>
+                <span class="label-text text-lg font-bold text-yellow-400"
+                  >Status</span
+                >
               </label>
               <select
+                v-if="statuses.length > 0"
                 id="status"
-                v-model="selectedTodo.status"
+                v-model="selectedTodo.statusName"
                 class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
               >
-                <option
-                  v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
-                  :value="status"
-                >
-                  {{ formatStatus(status) }}
+                <option v-for="status in statuses" :value="status">
+                  {{ status }}
                 </option>
               </select>
             </div>
 
             <div class="mt-2">
               <label for="itbkk-assignees" class="label">
-                <span class="label-text text-xl font-bold text-blue-200">Assignees</span>
+                <span class="label-text text-xl font-bold text-blue-200"
+                  >Assignees</span
+                >
               </label>
               <input
                 id="assignees"
@@ -254,7 +267,9 @@ onMounted(() => {
               />
             </div>
 
-            <div class="mt-3 p-3 bg-gray-400 rounded-lg shadow flex flex-col items-center justify-center">
+            <div
+              class="mt-3 p-3 bg-gray-400 rounded-lg shadow flex flex-col items-center justify-center"
+            >
               <div class="mb-2 w-full text-center">
                 <label class="label">
                   <span class="label-text text-lg text-black">Created On</span>
@@ -301,8 +316,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
-
 .unassigned-style {
   background-color: #f0f0f0; /* Light grey background */
   color: #ccc; /* Grey text */

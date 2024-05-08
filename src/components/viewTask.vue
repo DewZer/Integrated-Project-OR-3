@@ -9,14 +9,15 @@ const showViewModal = ref(false);
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
+const assigneesText = ref("");
 
 
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`
 
-      // `http://localhost:8080/v1/tasks/${id}`
+      `http://localhost:8080/v2/tasks/${id}`
     );
 
     if (!response.ok) {
@@ -103,17 +104,18 @@ onMounted(() => {
       <div class="bg-grey sm:p-6 sm:pb-4 flex-grow">
         <div class="sm:flex flex">
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <h3 class="text-lg leading-6 font-medium text-gray-200">
               <label for="title" class="label">
                 <span class="label-text text-2xl font-bold text-pink-400">Title</span>
               </label>
-              <input
-                type="text"
-                v-model="selectedTodo.title"
-                class="input input-bordered w-full bg-gray-500 rounded-lg text-black mt-2"
-                disabled
-                style="color: black !important"
-              />
+              <div class="bg-gray-200 rounded-md">
+                <label class="label">
+                  <span class="label-text text-lg text-black">
+                    {{ selectedTodo.title }}
+                  </span>
+                </label>
+              </div>
+              
             </h3>
 
             <div class="mt-2">
@@ -149,35 +151,26 @@ onMounted(() => {
               <label for="status" class="label">
                 <span class="label-text text-lg font-bold text-yellow-400">Status</span>
               </label>
-              <select
-                id="status"
-                v-model="selectedTodo.status"
-                class="select select-bordered w-full text-md bg-gray-800 rounded-lg"
-                disabled
-                style="color: black !important"
-              >
-                <option
-                  v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
-                  :value="status"
-                >
-                  {{ formatStatus(status) }}
-                </option>
-              </select>
+              <div class="bg-gray-200 rounded-md">
+                <label class="label">
+                  <span class="label-text text-lg text-black">
+                    {{ selectedTodo.statusName }}
+                  </span>
+                </label>
+            </div>
             </div>
 
             <div class="mt-2">
               <label for="itbkk-assignees" class="label">
                 <span class="label-text text-xl font-bold text-blue-200">Assignees</span>
               </label>
-              <input
-                id="assignees"
-                v-model="assigneesText"
-                class="input input-bordered w-full"
-                :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
-                :class="{ italic: !assigneesText }"
-                disabled
-                style="color: black !important"
-              />
+              <div class="bg-gray-200 rounded-md">
+                <label class="label">
+                  <span class="label-text text-lg text-black">
+                    {{ selectedTodo.assignees }}
+                  </span>
+                </label>
+              </div>
             </div>
 
             <div class="mt-3 p-3 bg-gray-400 rounded-lg shadow flex flex-col items-center justify-center">

@@ -18,13 +18,19 @@ const goToEdit = (id) => {
 const goToView = (id) => {
   router.push({ path: `/task/${id}` });
 };
+const gotoManageStatus = () => {
+  router.push({ path: "/task/status" });
+};
 
 const fetchTodos = async () => {
   try {
     
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
+    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
+    const response = await fetch("http://localhost:8080/v2/tasks");
+
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
+    console.log(todos.value);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -33,8 +39,8 @@ const fetchTodos = async () => {
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`,
-      // `http://localhost:8080/v1/tasks/${id}`,
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`,
+      `http://localhost:8080/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -96,7 +102,7 @@ onMounted(() => {
 <template>
   <div class="w-full flex flex-col items-start h-screen bg-slate-400">
     <div class="flex justify-center w-full mb-7 relative">
-      <span class="text-2xl md:text-3xl font-bold mb-3">
+      <span class="text-2xl md:text-3xl font-bold mb-3 text-black pt-4">
         ITBKK-Kradan Kanban
       </span>
       <span
@@ -104,7 +110,7 @@ onMounted(() => {
       ></span>
     </div>
 
-    <div class="w-full">
+    <div class="w-3/4 mx-auto">
       <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
         <thead class="bg-gray-200 w-full">
           <tr>
@@ -114,12 +120,18 @@ onMounted(() => {
             <th class="1/3 text-center">
               <button
                 @click="gotoAdd"
-                class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-lg"
+                class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-md"
               >
                 Add Task
               </button>
             </th>
-            <th></th>
+            <th>
+              <button
+                @click="gotoManageStatus"
+                class="itbkk-button-status btn btn-outline btn-info bg-yellow-600 btn-md ">
+              Manage Status
+              </button>
+            </th>
           </tr>
         </thead>
         <!-- body -->
@@ -141,7 +153,7 @@ onMounted(() => {
             class="itbkk-item hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-80"
           >
             <td
-              class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
+              class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-800 cursor-pointer"
               @click="goToView(todo.id)"
             >
               <div class="truncate text-md font-bold" :title="todo.title">
@@ -149,21 +161,17 @@ onMounted(() => {
               </div>
             </td>
             <td
-              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic"
+              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic text-gray-800"
             >
               {{ todo.assignees ? todo.assignees : "Unassigned" }}
             </td>
             <td
-              class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+              class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-800"
             >
               <div
                 class="rounded-full text-center"
-                :class="`status-${todo.status
-                  .toLowerCase()
-                  .replace(/[\s_]+/g, '-')}`"
-                style="padding: 8px; width: 100px; margin: auto"
               >
-                {{ formatStatus(todo.status) }}
+                {{ todo.statusName }}
               </div>
             </td>
 
