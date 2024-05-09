@@ -79,7 +79,9 @@ const fetchTasksByStatus = async (statusId) => {
     throw new Error("Failed to fetch tasks");
   }
   const tasks = await response.json();
-  return tasks.filter(task => task.statusName === selectedDeletedStatus.value.name);
+  return tasks.filter(
+    (task) => task.statusName === selectedDeletedStatus.value.name
+  );
 };
 
 const fetchStatuses = async () => {
@@ -97,7 +99,7 @@ const fetchStatuses = async () => {
 
 onMounted(async () => {
   await fetchStatuses();
-  const noStatus = statuses.value.find(status => status.name === 'No Status');
+  const noStatus = statuses.value.find((status) => status.name === "No Status");
   if (noStatus) {
     newStatus.value = noStatus.id;
   }
@@ -121,14 +123,16 @@ onMounted(async () => {
     </div>
 
     <div class="w-3/4 mx-auto">
-      <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
-        <thead class="bg-gray-200 w-full">
+      <table class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden">
+                <thead
+          class="w-full bg-gradient-to-r from-yellow-500 via-red-200 to-purple-600"
+        >
           <tr>
-            <th class="w-1/6 text-black text-center">Id</th>
-            <th class="w-1/3 text-black text-center">Status</th>
-            <th class="w-1/3 text-black text-center">Description</th>
-            <th class="w-1/12 text-black text-center"></th>
-            <th class="w-1/12 text-black text-center">
+            <th class="w-1/6 text-center text-gray-800 py-2">Id</th>
+            <th class="w-1/3 text-center text-gray-800 py-2">Status</th>
+            <th class="w-1/3 text-center text-gray-800 py-2">Description</th>
+            <th class="w-1/12 text-center text-gray-800 py-2"></th>
+            <th class="w-1/12 text-center py-2">
               <button
                 @click="gotoAddStatus"
                 class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-md"
@@ -141,11 +145,29 @@ onMounted(async () => {
 
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="status in statuses" :key="status.id" class="text-gray-800">
-            <td class="text-center">{{ status.id }}</td>
-            <td class="text-center">{{ status.name }}</td>
-            <td class="text-center">{{ status.statusDescription }}</td>
-            <td class="text-center">
+          <tr
+            v-for="status in statuses"
+            :key="status.id"
+            class="text-gray-800 hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-0.5 hover:scale-80"
+          >
+            <td
+              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
+            >
+              {{ status.id }}
+            </td>
+            <td
+              class="text-center px-6 py-4 whitespace-nowrap text-2sm font-medium text-blue-600 border-b border-gray-200"
+            >
+              {{ status.name }}
+            </td>
+            <td
+              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 border-b border-gray-200"
+            >
+              {{ status.statusDescription }}
+            </td>
+            <td
+              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
+            >
               <button
                 v-if="status.name !== 'No Status'"
                 @click="gotoEditStatus(status)"
@@ -153,12 +175,28 @@ onMounted(async () => {
               >
                 Edit
               </button>
+              <button
+                v-else
+                disabled
+                class="itbkk-button-edit btn btn-outline btn-primary bg-blue-200 btn-md opacity-0"
+              >
+                Edit
+              </button>
             </td>
-            <td class="text-center">
+            <td
+              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
+            >
               <button
                 v-if="status.name !== 'No Status'"
                 @click="openDeleteModal(status)"
                 class="itbkk-button-delete btn btn-outline btn-danger bg-red-200 btn-md"
+              >
+                Delete
+              </button>
+              <button
+                v-else
+                disabled
+                class="itbkk-button-delete btn btn-outline btn-danger bg-red-200 btn-md opacity-0"
               >
                 Delete
               </button>

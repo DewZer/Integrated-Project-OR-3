@@ -24,7 +24,6 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    
     // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
     const response = await fetch("http://localhost:8080/v2/tasks");
 
@@ -102,7 +101,9 @@ onMounted(() => {
 <template>
   <div class="w-full flex flex-col items-start h-screen bg-slate-400">
     <div class="flex justify-center w-full mb-7 relative">
-      <span class="text-2xl md:text-3xl font-bold mb-3 text-black pt-4">
+      <span
+        class="text-2xl md:text-4xl font-bold mb-3 text-white pt-4 shadow-lg"
+      >
         ITBKK-Kradan Kanban
       </span>
       <span
@@ -111,13 +112,15 @@ onMounted(() => {
     </div>
 
     <div class="w-3/4 mx-auto">
-      <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
-        <thead class="bg-gray-200 w-full">
+      <table class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden">
+        <thead
+          class="text-white w-full bg-gradient-to-r from-pink-300 via-blue-200 to-purple-300"
+        >
           <tr>
-            <th class="w-1/3 text-black text-center">Title</th>
-            <th class="w-1/4 text-black text-center">Assignees</th>
-            <th class="w-1/4 text-black text-center">Status</th>
-            <th class="1/3 text-center">
+            <th class="w-1/3 text-center text-gray-800 py-2">Title</th>
+            <th class="w-1/4 text-center text-gray-800 py-2">Assignees</th>
+            <th class="w-1/4 text-center text-gray-800 py-2">Status</th>
+            <th class="1/3 text-center py-2">
               <button
                 @click="gotoAdd"
                 class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-md"
@@ -128,8 +131,9 @@ onMounted(() => {
             <th>
               <button
                 @click="gotoManageStatus"
-                class="itbkk-button-status btn btn-outline btn-info bg-yellow-600 btn-md ">
-              Manage Status
+                class="itbkk-button-status btn btn-active btn-neutral btn-md hover:bg-blue-500 hover:text-white"
+              >
+                Manage Status
               </button>
             </th>
           </tr>
@@ -153,23 +157,33 @@ onMounted(() => {
             class="itbkk-item hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-80"
           >
             <td
-              class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-800 cursor-pointer"
+              class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-800 cursor-pointer border-b border-gray-200"
               @click="goToView(todo.id)"
             >
-              <div class="truncate text-md font-bold" :title="todo.title">
+              <div
+                class="truncate text-lg font-semibold text-blue-600"
+                :title="todo.title"
+              >
                 {{ todo.title }}
               </div>
             </td>
             <td
-              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic text-gray-800"
+              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic text-gray-800 border-b border-gray-200"
             >
-              {{ todo.assignees ? todo.assignees : "Unassigned" }}
+              <span class="text-md font-medium text-green-600">
+                {{ todo.assignees ? todo.assignees : "Unassigned" }}
+              </span>
             </td>
             <td
-              class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-800"
+              class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-800 border-b border-gray-200"
             >
               <div
-                class="rounded-full text-center"
+                class="rounded-full text-center px-2 py-1"
+                :class="
+                  todo.statusName === 'No Status'
+                    ? 'bg-gray-200 text-gray-800'
+                    : 'bg-blue-200 text-blue-800'
+                "
               >
                 {{ todo.statusName }}
               </div>
@@ -180,17 +194,17 @@ onMounted(() => {
             >
               <button
                 @click="openDeleteModal(todo.id)"
-                class="itbkk-button-action text-red-600 hover:text-red-900"
+                class="itbkk-button-action bg-red-500 text-white hover:bg-red-700 px-3 py-1 rounded"
               >
                 Delete
               </button>
             </td>
             <td
-              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"
             >
               <button
                 @click="goToEdit(todo.id)"
-                class="text-indigo-600 hover:text-indigo-900"
+                class="bg-indigo-500 text-white hover:bg-indigo-700 px-3 py-1 rounded"
               >
                 Edit
               </button>
@@ -246,7 +260,6 @@ onMounted(() => {
       </div>
     </div>
   </div>
-
 </template>
 
 <style>
