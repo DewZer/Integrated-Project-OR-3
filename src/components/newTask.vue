@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref , onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 
@@ -14,13 +14,14 @@ let newTodo = ref({
   assignees: "",
   status: "NO_STATUS",
 });
+
+const statuses = ref([]);
 const router = useRouter();
 
 const closeModal = () => {
   showAddModal.value = false;
   router.push("/task");
 };
-
 
 const formatStatus = (status) => {
   switch (status) {
@@ -36,11 +37,14 @@ const formatStatus = (status) => {
 };
 
 const addTodo = async () => {
-  if (!newTodo.value.title.trim()) {
+  if (!newTodo.value.title) {
     errorMessage.value = "Title is required";
     return;
   }
-  const todo = { ...newTodo.value };
+
+  const todo = { ...newTodo.value, statusName: newTodo.value.status };
+  delete todo.status;
+
   if (!todo.description) {
     delete todo.description;
   }
@@ -49,8 +53,7 @@ const addTodo = async () => {
   }
 
   try {
-    // const response = await fetch("http://localhost:8080/v1/tasks");
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -62,38 +65,39 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
-    // const response2 = await fetch("http://localhost:8080/v1/tasks", {
-      const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks", {
-
+    const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(todo),
     });
-    if (response2.status === 201) {
-      toast.success("Task added successfully");
-    } else {
+
+    if (!response2.ok) {
       throw new Error(`HTTP error! status: ${response2.status}`);
     }
 
-    const data = await response2.json();
-    allTodos.value.push(data);
-    errorMessage.value = "";
-    showAddModal.value = false;
-    newTodo.value = {
-      title: "",
-      description: "",
-      assignees: "",
-      status: "NO_STATUS",
-    };
+    toast.success("Task added successfully");
     router.push("/task");
-  } catch (error) {
-    console.error("Error:", error);
+    } catch (error) {
+    errorMessage.value = error.message;
   }
 };
 
 const emit = defineEmits(["task-added"]);
+
+onMounted(async () => {
+  try {
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
+    if (!response.ok) {
+      throw new Error("Failed to fetch statuses");
+    }
+    const data = await response.json();
+    statuses.value = data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+});
 </script>
 
 <template>
@@ -110,7 +114,9 @@ const emit = defineEmits(["task-added"]);
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
               <label for="title" class="label">
-                <span class="label-text text-2xl font-bold text-pink-400">Title</span>
+                <span class="label-text text-2xl font-bold text-pink-400"
+                  >Title</span
+                >
               </label>
               <input
                 type="text"
@@ -122,7 +128,9 @@ const emit = defineEmits(["task-added"]);
 
             <div class="mt-2">
               <label for="description" class="label">
-                <span class="label-text text-2xl text-green-400 font-bold">Description</span>
+                <span class="label-text text-2xl text-green-400 font-bold"
+                  >Description</span
+                >
               </label>
               <textarea
                 v-model="newTodo.description"
@@ -133,24 +141,29 @@ const emit = defineEmits(["task-added"]);
 
             <div class="mt-2">
               <label for="status" class="label">
-                <span class="label-text text-lg font-bold text-yellow-400">Status</span>
+                <span class="label-text text-lg font-bold text-yellow-400"
+                  >Status</span
+                >
               </label>
               <select
                 v-model="newTodo.status"
                 class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
               >
                 <option
-                  v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
-                  :value="status"
+                  v-for="status in statuses"
+                  :value="status.name"
+                  :key="status.id"
                 >
-                  {{ formatStatus(status) }}
+                  {{ status.name }}
                 </option>
               </select>
             </div>
 
             <div class="mt-2">
               <label for="assignees" class="label">
-                <span class="label-text text-xl font-bold text-blue-200">Assignees</span>
+                <span class="label-text text-xl font-bold text-blue-200"
+                  >Assignees</span
+                >
               </label>
               <input
                 type="text"
