@@ -22,9 +22,9 @@ const routes = [
   { path: '/task/:id', component: viewTask, props: true, name: 'viewTask' },
   { path: '/task/add', component: newTask, props: true, name: 'newTask' },
   { path: '/task/:id/edit', component: editTasks, props: true, name: 'editTask' },
-  { path: '/task/status', component: ManageStatus, props: true, name: 'ManageStatus' },
-  { path: '/task/status/add', component: addStatus, props: true, name: 'addStatus' },
-  { path: '/task/status/:id', component: editStatus, props: true, name: 'editStatus' },
+  // { path: '/task/status', component: ManageStatus, props: true, name: 'ManageStatus' },
+  // { path: '/task/status/add', component: addStatus, props: true, name: 'addStatus' },
+  // { path: '/task/status/:id', component: editStatus, props: true, name: 'editStatus' },
 
 ]
 

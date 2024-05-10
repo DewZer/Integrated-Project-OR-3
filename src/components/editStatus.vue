@@ -14,8 +14,8 @@ const isSaveButtonDisabled = ref(true);
 
 const fetchDataById = async (id) => {
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
-    // const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
+    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
+    const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
     if (!response.ok) {
       throw new Error("No status found with this ID");
     }
@@ -55,8 +55,8 @@ const closeModalWithEdit = async () => {
   delete statusToUpdate.updatedOn;
 
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
-    // const response = await fetch(`http://localhost:8080/v2/statuses/${statusToUpdate.id}`, {
+    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
+    const response = await fetch(`http://localhost:8080/v2/statuses/${statusToUpdate.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

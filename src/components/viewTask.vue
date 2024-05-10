@@ -14,9 +14,9 @@ const assigneesText = ref("");
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
+      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`
 
-      // `http://localhost:8080/v2/tasks/${id}`
+      // `http://localhost:8080/v1/tasks/${id}`
     );
 
     if (!response.ok) {
@@ -156,7 +156,7 @@ onMounted(() => {
               <div class="bg-gray-200 rounded-md">
                 <label class="label">
                   <span class="label-text text-lg text-black">
-                    {{ selectedTodo.statusName }}
+                    {{ formatStatus(selectedTodo.status) }}
                   </span>
                 </label>
               </div>

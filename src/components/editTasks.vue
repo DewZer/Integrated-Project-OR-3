@@ -15,28 +15,29 @@ const originalTodo = ref(null);
 const isSaveButtonDisabled = ref(true);
 const statuses = ref([]);
 
-const fetchStatuses = async () => {
-  try {
-    const response = await fetch(`http://localhost:8080/v2/statuses`);
-    console.log("fetching statuses");
-    if (!response.ok) {
-      throw new Error("Failed to fetch statuses");
-    }
+// const fetchStatuses = async () => {
+//   try {
+//     // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`);
 
-    const data = await response.json();
-    statuses.value = data.map((status) => status.name);
-    console.log(statuses.value);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+//     const response = await fetch(`http://localhost:8080/v2/statuses`);
+//     console.log("fetching statuses");
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch statuses");
+//     }
+
+//     const data = await response.json();
+//     statuses.value = data.map((status) => status.name);
+//     console.log(statuses.value);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// };
 
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`);
-
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
+      `http://localhost:8080/v1/tasks/${id}`
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
     );
 
     if (!response.ok) {
@@ -84,7 +85,8 @@ const closeModalWithEdit = async () => {
 
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
+      `http://localhost:8080/v1/tasks/${todoToUpdate.id}`,
 
       {
         method: "PUT",
@@ -172,8 +174,21 @@ const formatDate = (dateString) => {
   return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
 
+const formatStatus = (status) => {
+  switch (status) {
+    case "NO_STATUS":
+      return "No Status";
+    case "TO_DO":
+      return `To Do`;
+    case "DOING":
+      return `Doing`;
+    case "DONE":
+      return `Done`;
+  }
+};
+
 onMounted(async () => {
-  await fetchStatuses();
+  // await fetchStatuses();
   fetchDataById(route.params.id);
 });
 </script>
@@ -233,21 +248,27 @@ onMounted(async () => {
             </div>
 
             <div class="mt-2">
-              <label for="status" class="label">
-                <span class="label-text text-lg font-bold text-yellow-400"
-                  >Status</span
-                >
-              </label>
-              <select
-                v-if="statuses.length > 0"
-                id="status"
-                v-model="selectedTodo.statusName"
-                class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
+              <label
+                for="status"
+                class="block text-sm font-medium text-gray-700"
+                >Status</label
               >
-                <option v-for="status in statuses" :value="status">
-                  {{ status }}
+              <select
+                id="status"
+                v-model="selectedTodo.status"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              >
+                <option
+                  v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
+                  :value="status"
+                >
+                  {{ formatStatus(status) }}
                 </option>
               </select>
+            </div>
+
+            <div class="mt-2">
+              <p class="mt-1 text-sm text-gray-500">{{ getTimeZone() }}</p>
             </div>
 
             <div class="mt-2">

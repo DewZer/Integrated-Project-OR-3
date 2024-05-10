@@ -24,8 +24,8 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
-    // const response = await fetch("http://localhost:8080/v2/tasks");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
+    // const response = await fetch("http://localhost:8080/v1/tasks");
 
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
@@ -38,8 +38,8 @@ const fetchTodos = async () => {
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
-      // `http://localhost:8080/v2/tasks/${id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`,
+      // `http://localhost:8080/v1/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -131,12 +131,12 @@ onMounted(() => {
               </button>
             </th>
             <th>
-              <button
+              <!-- <button
                 @click="gotoManageStatus"
                 class="itbkk-button-status btn btn-active btn-neutral btn-md hover:bg-blue-500 hover:text-white"
               >
                 Manage Status
-              </button>
+              </button> -->
             </th>
           </tr>
         </thead>
@@ -189,7 +189,7 @@ onMounted(() => {
                     : 'bg-blue-200 text-blue-800'
                 "
               >
-                {{ todo.statusName }}
+                {{ formatStatus(todo.status)  }}
               </div>
             </td>
 
