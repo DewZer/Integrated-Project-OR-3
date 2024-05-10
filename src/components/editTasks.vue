@@ -86,8 +86,6 @@ const closeModalWithEdit = async () => {
     const response = await fetch(
       `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
 
-      // `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
-
       {
         method: "PUT",
         headers: {
