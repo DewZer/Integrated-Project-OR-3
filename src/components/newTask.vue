@@ -150,15 +150,15 @@ onMounted(async () => {
                 >
               </label>
               <select
+                id="status"
                 v-model="newTodo.status"
-                class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               >
                 <option
-                  v-for="status in statuses"
-                  :value="status.name"
-                  :key="status.id"
+                  v-for="status in ['NO_STATUS', 'TO_DO', 'DOING', 'DONE']"
+                  :value="status"
                 >
-                  {{ status.name }}
+                  {{ formatStatus(status) }}
                 </option>
               </select>
             </div>
