@@ -24,8 +24,8 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
-    const response = await fetch("http://localhost:8080/v2/tasks");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
+    // const response = await fetch("http://localhost:8080/v2/tasks");
 
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
@@ -38,8 +38,8 @@ const fetchTodos = async () => {
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`,
-      `http://localhost:8080/v2/tasks/${id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
+      // `http://localhost:8080/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -112,7 +112,9 @@ onMounted(() => {
     </div>
 
     <div class="w-3/4 mx-auto">
-      <table class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden">
+      <table
+        class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
+      >
         <thead
           class="text-white w-full bg-gradient-to-r from-pink-300 via-blue-200 to-purple-300"
         >
@@ -140,17 +142,19 @@ onMounted(() => {
         </thead>
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
+          <!-- if no taask -->
           <tr
             v-if="todos.length === 0"
-            class="flex justify-center items-center min-h-screen hover"
+            class="justify-center items-center min-h-screen hover"
           >
             <td
               colspan="5"
-              class="1/3 px-6 py-4 whitespace-nowrap text-sm text-gray-800"
+              class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 h-20"
             >
-              No task
+              <h2 class="text-lg font-semibold text-gray-700">No tasks yet</h2>
             </td>
           </tr>
+
           <tr
             v-for="todo in todos"
             :key="todo.id"

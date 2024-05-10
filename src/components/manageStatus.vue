@@ -47,7 +47,8 @@ const confirmDelete = async () => {
 };
 
 const deleteStatus = async (statusId, newStatusId) => {
-  let url = `http://localhost:8080/v2/statuses/${statusId}`;
+  let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
+  // let url = `http://localhost:8080/v2/statuses/${statusId}`;
   if (newStatusId) {
     url += `/${newStatusId}`;
   }
@@ -73,7 +74,9 @@ const confirmTransfer = async () => {
 };
 const fetchTasksByStatus = async (statusId) => {
   const response = await fetch(
-    `http://localhost:8080/v2/tasks?statusId=${statusId}`
+    `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
+
+    // `http://localhost:8080/v2/tasks?statusId=${statusId}`
   );
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -86,7 +89,8 @@ const fetchTasksByStatus = async (statusId) => {
 
 const fetchStatuses = async () => {
   try {
-    const response = await fetch("http://localhost:8080/v2/statuses");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
+    // const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
     }
@@ -128,7 +132,7 @@ onMounted(async () => {
           class="w-full bg-gradient-to-r from-yellow-500 via-red-200 to-purple-600"
         >
           <tr>
-            <th class="w-1/6 text-center text-gray-800 py-2">Id</th>
+            <th class="w-1/6 text-center text-gray-800 py-2">ID</th>
             <th class="w-1/3 text-center text-gray-800 py-2">Status</th>
             <th class="w-1/3 text-center text-gray-800 py-2">Description</th>
             <th class="w-1/12 text-center text-gray-800 py-2"></th>
@@ -146,14 +150,14 @@ onMounted(async () => {
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
           <tr
-            v-for="status in statuses"
+          v-for="(status, index) in statuses"
             :key="status.id"
             class="text-gray-800 hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-0.5 hover:scale-80"
           >
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
             >
-              {{ status.id }}
+            {{ index + 1 }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-2sm font-medium text-blue-600 border-b border-gray-200"
