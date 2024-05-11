@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-
+import { useToast } from "vue-toastification";
+const toast = useToast();
 const router = useRouter();
 let statuses = ref([]);
 const showDeleteModal = ref(false);
@@ -47,8 +48,8 @@ const confirmDelete = async () => {
 };
 
 const deleteStatus = async (statusId, newStatusId) => {
-  let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
-  // let url = `http://localhost:8080/v2/statuses/${statusId}`;
+  let url = `http://localhost:8080/v2/statuses/${statusId}`;
+  // let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
   if (newStatusId) {
     url += `/${newStatusId}`;
   }
@@ -57,26 +58,34 @@ const deleteStatus = async (statusId, newStatusId) => {
     method: "DELETE",
   });
   if (!response.ok) {
+    if (response.status === 404) {
+      toast.error('An error has occurred, the status does not exist.');
+    } else {
+      toast.error('Failed to delete status');
+    }
     throw new Error("Failed to delete status");
   }
+  toast.success('The status has been deleted');
 };
 
 const confirmTransfer = async () => {
   try {
     await deleteStatus(selectedDeletedStatus.value.id, newStatus.value);
     showTransferModal.value = false;
-    showDeleteModal.value = false; // add this line
+    showDeleteModal.value = false;
     selectedDeletedStatus.value = null;
     await fetchStatuses();
   } catch (error) {
     console.error("Error:", error);
+    toast.error('An error has occurred while transferring the status.');
   }
 };
+
+
 const fetchTasksByStatus = async (statusId) => {
   const response = await fetch(
-    `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
-
-    // `http://localhost:8080/v2/tasks?statusId=${statusId}`
+    `http://localhost:8080/v2/tasks?statusId=${statusId}`
+    // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
   );
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -89,8 +98,8 @@ const fetchTasksByStatus = async (statusId) => {
 
 const fetchStatuses = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
-    // const response = await fetch("http://localhost:8080/v2/statuses");
+    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
+    const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
     }
@@ -127,8 +136,10 @@ onMounted(async () => {
     </div>
 
     <div class="w-3/4 mx-auto">
-      <table class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden">
-                <thead
+      <table
+        class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
+      >
+        <thead
           class="w-full bg-gradient-to-r from-yellow-500 via-red-200 to-purple-600"
         >
           <tr>
@@ -150,14 +161,14 @@ onMounted(async () => {
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
           <tr
-          v-for="(status, index) in statuses"
+            v-for="(status, index) in statuses"
             :key="status.id"
             class="text-gray-800 hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-0.5 hover:scale-80"
           >
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
             >
-            {{ index + 1 }}
+              {{ index + 1 }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-2sm font-medium text-blue-600 border-b border-gray-200"
@@ -172,6 +183,7 @@ onMounted(async () => {
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
             >
+
               <button
                 v-if="status.name !== 'No Status'"
                 @click="gotoEditStatus(status)"
@@ -204,6 +216,9 @@ onMounted(async () => {
               >
                 Delete
               </button>
+
+
+
             </td>
           </tr>
         </tbody>
@@ -219,8 +234,7 @@ onMounted(async () => {
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="flex flex-col items-center justify-center text-center">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Do you want to delete the status number
-                {{ selectedDeletedStatus.id }}
+                Do you want to delete the status 
               </h3>
               <h3
                 class="text-lg leading-6 font-medium text-gray-900 truncate-title"

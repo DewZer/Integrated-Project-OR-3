@@ -24,8 +24,8 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
-    // const response = await fetch("http://localhost:8080/v2/tasks");
+    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
+    const response = await fetch("http://localhost:8080/v2/tasks");
 
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
@@ -35,11 +35,15 @@ const fetchTodos = async () => {
   }
 };
 
+const truncateTitle = (title) => {
+  return title.length > 70 ? title.substring(0, 70) + '...' : title;
+};
+
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
-      // `http://localhost:8080/v2/tasks/${id}`,
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
+      `http://localhost:8080/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -168,7 +172,7 @@ onMounted(() => {
                 class="truncate text-lg font-semibold text-blue-600"
                 :title="todo.title"
               >
-                {{ todo.title }}
+              {{ truncateTitle(todo.title) }}
               </div>
             </td>
             <td

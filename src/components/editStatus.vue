@@ -2,26 +2,29 @@
 import { ref, onMounted, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+import { reactive, watchEffect } from "vue";
+import { isEqual } from 'lodash';
 
-const selectedStatus = ref(null);
+let selectedStatus = ref(null);
+let originalStatus = ref(null);
 const showEditModal = ref(false);
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 let errorMessage = ref("");
-const originalStatus = ref(null);
 const isSaveButtonDisabled = ref(true);
 
 const fetchDataById = async (id) => {
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
-    // const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
+    const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
+    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
+
     if (!response.ok) {
       throw new Error("No status found with this ID");
     }
     const data = await response.json();
-    selectedStatus.value = data;
-    originalStatus.value = { ...data };
+    selectedStatus.value = reactive(data);
+    originalStatus.value = reactive({ ...data });
     showEditModal.value = true;
     console.log(selectedStatus.value);
   } catch (error) {
@@ -38,11 +41,11 @@ const closeModal = () => {
 
 
 const closeModalWithEdit = async () => {
-  selectedStatus.value = { 
-    ...selectedStatus.value, 
-    name: selectedStatus.value.name.trim(),
-    statusDescription: selectedStatus.value.statusDescription.trim()
-  };
+selectedStatus.value = { 
+  ...selectedStatus.value, 
+  name: selectedStatus.value.name.trim(),
+  statusDescription: selectedStatus.value.statusDescription ? selectedStatus.value.statusDescription.trim() : null
+};
 
   if (!selectedStatus.value.name) {
     errorMessage.value = "Name is required";
@@ -55,8 +58,8 @@ const closeModalWithEdit = async () => {
   delete statusToUpdate.updatedOn;
 
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
-    // const response = await fetch(`http://localhost:8080/v2/statuses/${statusToUpdate.id}`, {
+    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
+    const response = await fetch(`http://localhost:8080/v2/statuses/${statusToUpdate.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -76,11 +79,13 @@ const closeModalWithEdit = async () => {
   }
 };
 
-watch(selectedStatus, () => {
-  isSaveButtonDisabled.value = 
-    selectedStatus.value.name === originalStatus.value.name &&
-    selectedStatus.value.description === originalStatus.value.description;
+
+watchEffect(() => {
+  isSaveButtonDisabled.value =
+    !selectedStatus.value?.name.trim() ||
+    isEqual(selectedStatus.value, originalStatus.value);
 });
+
 onMounted(() => {
   const id = route.params.id;
   fetchDataById(id);
@@ -96,7 +101,7 @@ onMounted(() => {
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
               <label for="status-name" class="label">
-                <span class="label-text text-2xl font-bold text-pink-400">Status ID: {{ selectedStatus.id }}</span>
+                <span class="label-text text-2xl font-bold text-pink-400">Status :</span>
               </label>
               <input id="status-name" v-model="selectedStatus.name" type="text" class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2" placeholder="Status" />
               
@@ -111,7 +116,7 @@ onMounted(() => {
         </div>
 
         <div class="bg-grey-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t mt-3">
-          <button @click="closeModalWithEdit" type="button" class="btn btn-outline btn-success ml-2 sm:ml-4">Save</button>
+          <button @click="closeModalWithEdit" type="button" class="btn btn-outline btn-success ml-2 sm:ml-4" :disabled="isSaveButtonDisabled">Save</button>
           <button @click="closeModal" type="button" class="btn btn-outline btn-error">Cancel</button>
         </div>
       </div>

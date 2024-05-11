@@ -1,9 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+
 const router = useRouter();
+const toast = useToast();
 const showAddModal = ref(true);
 const newStatus = ref({ name: '', description: '' });
+
 
 const closeModal = () => {
   showAddModal.value = false;
@@ -12,9 +16,10 @@ const closeModal = () => {
 
 
 const addStatus = async () => {
-  const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
-
-  // const response = await fetch('http://localhost:8080/v2/statuses', {
+    // const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
+      newStatus.value.name = newStatus.value.name?.trim();
+      newStatus.value.statusDescription = newStatus.value.statusDescription?.trim();
+  const response = await fetch('http://localhost:8080/v2/statuses', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -24,11 +29,13 @@ const addStatus = async () => {
 
   if (!response.ok) {
     console.error('Failed to add status', response);
+    toast.error('Failed to add status');
     return;
   }
 
   newStatus.value = { name: '', description: '' };
   closeModal();
+  toast.success('Status added successfully');
 };
 
 </script>
