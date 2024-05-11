@@ -35,6 +35,10 @@ const fetchTodos = async () => {
   }
 };
 
+const truncateTitle = (title) => {
+  return title.length > 70 ? title.substring(0, 70) + '...' : title;
+};
+
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
@@ -168,7 +172,7 @@ onMounted(() => {
                 class="truncate text-lg font-semibold text-blue-600"
                 :title="todo.title"
               >
-                {{ todo.title }}
+              {{ truncateTitle(todo.title) }}
               </div>
             </td>
             <td
