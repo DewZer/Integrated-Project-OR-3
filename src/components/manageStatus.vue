@@ -59,13 +59,13 @@ const deleteStatus = async (statusId, newStatusId) => {
   });
   if (!response.ok) {
     if (response.status === 404) {
-      toast.error('An error has occurred, the status does not exist.');
+      toast.error("An error has occurred, the status does not exist.");
     } else {
-      toast.error('Failed to delete status');
+      toast.error("Failed to delete status");
     }
     throw new Error("Failed to delete status");
   }
-  toast.success('The status has been deleted');
+  toast.success("The status has been deleted");
 };
 
 const confirmTransfer = async () => {
@@ -77,10 +77,9 @@ const confirmTransfer = async () => {
     await fetchStatuses();
   } catch (error) {
     console.error("Error:", error);
-    toast.error('An error has occurred while transferring the status.');
+    toast.error("An error has occurred while transferring the status.");
   }
 };
-
 
 const fetchTasksByStatus = async (statusId) => {
   const response = await fetch(
@@ -119,17 +118,17 @@ onMounted(async () => {
 });
 </script>
 <template>
+  <div></div>
   <div class="w-full flex flex-col items-start h-screen bg-slate-400">
-    <div class="flex justify-between w-full mb-7 relative px-4">
-      <div>
-        <button @click="goBack" class="btn btn-accent mt-4">Back</button>
-      </div>
-      <div class="flex justify-center w-full">
-        <span class="text-2xl md:text-3xl font-bold mb-3 text-black pt-4">
-          ITBKK-Kradan Kanban
-        </span>
-      </div>
-      <div></div>
+    <div class="flex justify-center w-full mb-7 relative">
+      <button @click="goBack" class="btn btn-accent mt-4 absolute top-0 left-2">
+        Back
+      </button>
+      <span
+        class="text-2xl md:text-4xl font-bold mb-3 text-white pt-4 shadow-lg"
+      >
+        ITBKK-Kradan Kanban
+      </span>
       <span
         class="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-green-600 rounded-full"
       ></span>
@@ -183,7 +182,6 @@ onMounted(async () => {
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
             >
-
               <button
                 v-if="status.name !== 'No Status'"
                 @click="gotoEditStatus(status)"
@@ -216,9 +214,6 @@ onMounted(async () => {
               >
                 Delete
               </button>
-
-
-
             </td>
           </tr>
         </tbody>
@@ -234,7 +229,7 @@ onMounted(async () => {
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="flex flex-col items-center justify-center text-center">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Do you want to delete the status 
+                Do you want to delete the status
               </h3>
               <h3
                 class="text-lg leading-6 font-medium text-gray-900 truncate-title"

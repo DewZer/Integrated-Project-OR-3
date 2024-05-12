@@ -1,5 +1,5 @@
 <script setup>
-import { ref , onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 
@@ -7,12 +7,11 @@ const toast = useToast();
 
 const showAddModal = ref(true);
 let errorMessage = ref("");
-const allTodos = ref([]);
 let newTodo = ref({
   title: "",
   description: "",
   assignees: "",
-  status: "NO_STATUS",
+  status: "No Status",
 });
 
 const statuses = ref([]);
@@ -23,20 +22,44 @@ const closeModal = () => {
   router.push("/task");
 };
 
-const formatStatus = (status) => {
-  switch (status) {
-    case "NO_STATUS":
-      return "No Status";
-    case "TO_DO":
-      return `To Do`;
-    case "DOING":
-      return `Doing`;
-    case "DONE":
-      return `Done`;
+// const formatStatus = (status) => {
+//   switch (status) {
+//     case "NO_STATUS":
+//       return "No Status";
+//     case "TO_DO":
+//       return `To Do`;
+//     case "DOING":
+//       return `Doing`;
+//     case "DONE":
+//       return `Done`;
+//   }
+// };
+
+const fetchStatuses = async () => {
+  try {
+    // const response = await fetch(`http://localhost:8080/v2/statuses`);
+    const response = await fetch(
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
+    );
+
+    console.log("fetching statuses");
+    if (!response.ok) {
+      throw new Error("Failed to fetch statuses");
+    }
+
+    const data = await response.json();
+    statuses.value = data.map((status) => status.name);
+    console.log(statuses.value);
+  } catch (error) {
+    console.error("Error:", error);
   }
 };
 
 const addTodo = async () => {
+  newTodo.value.title = newTodo.value.title.trim();
+  newTodo.value.description = newTodo.value.description.trim();
+  newTodo.value.assignees = newTodo.value.assignees.trim();
+
   if (!newTodo.value.title) {
     errorMessage.value = "Title is required";
     return;
@@ -53,8 +76,8 @@ const addTodo = async () => {
   }
 
   try {
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks");
     // const response = await fetch("http://localhost:8080/v2/tasks");
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -66,8 +89,8 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
+    const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks", {
     // const response2 = await fetch("http://localhost:8080/v2/tasks", {
-    const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,7 +104,7 @@ const addTodo = async () => {
 
     toast.success("Task added successfully");
     router.push("/task");
-    } catch (error) {
+  } catch (error) {
     errorMessage.value = error.message;
   }
 };
@@ -89,17 +112,8 @@ const addTodo = async () => {
 const emit = defineEmits(["task-added"]);
 
 onMounted(async () => {
-  try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
-    // const response = await fetch("http://localhost:8080/v2/statuses");
-    if (!response.ok) {
-      throw new Error("Failed to fetch statuses");
-    }
-    const data = await response.json();
-    statuses.value = data;
-  } catch (error) {
-    console.error("Error:", error);
-  }
+  await fetchStatuses();
+
 });
 </script>
 
@@ -149,15 +163,12 @@ onMounted(async () => {
                 >
               </label>
               <select
+                id="status"
                 v-model="newTodo.status"
-                class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-200"
               >
-                <option
-                  v-for="status in statuses"
-                  :value="status.name"
-                  :key="status.id"
-                >
-                  {{ status.name }}
+                <option v-for="status in statuses" :value="status">
+                  {{ status }}
                 </option>
               </select>
             </div>
