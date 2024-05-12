@@ -17,7 +17,9 @@ const statuses = ref([]);
 
 const fetchStatuses = async () => {
   try {
-    const response = await fetch(`http://localhost:8080/v2/statuses`);
+    // const response = await fetch(`http://localhost:8080/v2/statuses`);
+    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`);
+
     console.log("fetching statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
@@ -34,9 +36,8 @@ const fetchStatuses = async () => {
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${id}`);
-
-      `http://localhost:8080/v2/tasks/${id}`
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
+      // `http://localhost:8080/v2/tasks/${id}`
     );
 
     if (!response.ok) {
@@ -84,10 +85,8 @@ const closeModalWithEdit = async () => {
 
   try {
     const response = await fetch(
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v1/tasks/${todoToUpdate.id}`,
-
-      `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
-
+      // `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
       {
         method: "PUT",
         headers: {
