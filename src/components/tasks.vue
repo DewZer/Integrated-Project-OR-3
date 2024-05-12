@@ -36,7 +36,7 @@ const fetchTodos = async () => {
 };
 
 const truncateTitle = (title) => {
-  return title.length > 70 ? title.substring(0, 70) + '...' : title;
+  return title.length > 70 ? title.substring(0, 70) + "..." : title;
 };
 
 const deleteTodoById = async (id) => {
@@ -172,11 +172,11 @@ onMounted(() => {
                 class="truncate text-lg font-semibold text-blue-600"
                 :title="todo.title"
               >
-              {{ truncateTitle(todo.title) }}
+                {{ truncateTitle(todo.title) }}
               </div>
             </td>
             <td
-              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic text-gray-800 border-b border-gray-200"
+              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic text-gray-800 border-b border-gray-200 flex items-center justify-center"
             >
               <span class="text-md font-medium text-green-600">
                 {{ todo.assignees ? todo.assignees : "Unassigned" }}

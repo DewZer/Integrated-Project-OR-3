@@ -139,21 +139,15 @@ onMounted(() => {
               ></textarea>
             </div>
 
-            <div class="mt-2 bg-gray-500 rounded-md">
-              <label for="status" class="label">
-                <span class="label-text text-md text-white"
-                  >Timezone : {{ getTimeZone() }}</span
-                >
-              </label>
-            </div>
-
             <div class="mt-2">
               <label for="status" class="label">
                 <span class="label-text text-lg font-bold text-yellow-400"
                   >Status</span
                 >
               </label>
-              <div class="bg-gray-200 rounded-md">
+              <div
+                class="bg-gray-200 rounded-md flex items-center justify-center"
+              >
                 <label class="label">
                   <span class="label-text text-lg text-black">
                     {{ selectedTodo.statusName }}
@@ -182,9 +176,19 @@ onMounted(() => {
             </div>
 
             <div
+              class="mt-2 bg-gray-500 rounded-md flex items-center justify-center"
+            >
+              <label for="status" class="label">
+                <span class="label-text text-lg text-white"
+                  >Timezone : {{ getTimeZone() }}</span
+                >
+              </label>
+            </div>
+
+            <div
               class="mt-3 p-3 bg-gray-400 rounded-lg shadow flex flex-col items-center justify-center"
             >
-              <div class="mb-2 w-full text-center">
+              <div class="mb-2 w-full flex flex-col items-center">
                 <label class="label">
                   <span class="label-text text-lg text-black">Created On</span>
                 </label>
@@ -193,7 +197,7 @@ onMounted(() => {
                 </p>
               </div>
 
-              <div class="mt-2 w-full text-center">
+              <div class="mt-2 w-full flex flex-col items-center">
                 <label class="label">
                   <span class="label-text text-lg text-black">Updated On</span>
                 </label>

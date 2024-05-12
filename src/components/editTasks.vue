@@ -18,7 +18,9 @@ const statuses = ref([]);
 const fetchStatuses = async () => {
   try {
     // const response = await fetch(`http://localhost:8080/v2/statuses`);
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`);
+    const response = await fetch(
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
+    );
 
     console.log("fetching statuses");
     if (!response.ok) {
@@ -225,14 +227,6 @@ onMounted(async () => {
               ></textarea>
             </div>
 
-            <div class="mt-2 bg-gray-500 rounded-md">
-              <label for="status" class="label">
-                <span class="label-text text-md text-white"
-                  >Timezone : {{ getTimeZone() }}</span
-                >
-              </label>
-            </div>
-
             <div class="mt-2">
               <label for="status" class="label">
                 <span class="label-text text-lg font-bold text-yellow-400"
@@ -267,9 +261,19 @@ onMounted(async () => {
             </div>
 
             <div
+              class="mt-2 bg-gray-500 rounded-md flex items-center justify-center"
+            >
+              <label for="status" class="label">
+                <span class="label-text text-md text-white text-lg"
+                  >Timezone : {{ getTimeZone() }}</span
+                >
+              </label>
+            </div>
+
+            <div
               class="mt-3 p-3 bg-gray-400 rounded-lg shadow flex flex-col items-center justify-center"
             >
-              <div class="mb-2 w-full text-center">
+              <div class="mb-2 w-full flex flex-col items-center">
                 <label class="label">
                   <span class="label-text text-lg text-black">Created On</span>
                 </label>
@@ -278,7 +282,7 @@ onMounted(async () => {
                 </p>
               </div>
 
-              <div class="mt-2 w-full text-center">
+              <div class="mt-2 w-full flex flex-col items-center">
                 <label class="label">
                   <span class="label-text text-lg text-black">Updated On</span>
                 </label>
