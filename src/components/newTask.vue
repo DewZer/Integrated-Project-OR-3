@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+import { computed } from "vue";
 
 const toast = useToast();
 
@@ -38,18 +39,13 @@ const closeModal = () => {
 const fetchStatuses = async () => {
   try {
     // const response = await fetch(`http://localhost:8080/v2/statuses`);
-    const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
-    );
-
-    console.log("fetching statuses");
+    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`);
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
     }
 
     const data = await response.json();
-    statuses.value = data.map((status) => status.name);
-    console.log(statuses.value);
+    statuses.value = data;
   } catch (error) {
     console.error("Error:", error);
   }
@@ -65,8 +61,8 @@ const addTodo = async () => {
     return;
   }
 
-  const todo = { ...newTodo.value, status: newTodo.value.status };
-  delete todo.status;
+  const statusObject = statuses.value.find(status => status.name === newTodo.value.status);
+  const todo = { ...newTodo.value, status: statusObject ? statusObject.id : null };
 
   if (!todo.description) {
     delete todo.description;
@@ -76,8 +72,10 @@ const addTodo = async () => {
   }
 
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
     // const response = await fetch("http://localhost:8080/v2/tasks");
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
+
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -89,8 +87,9 @@ const addTodo = async () => {
     }
     todo.id = maxId + 1;
 
-    const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks", {
     // const response2 = await fetch("http://localhost:8080/v2/tasks", {
+      const response2 = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks", {
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -108,12 +107,10 @@ const addTodo = async () => {
     errorMessage.value = error.message;
   }
 };
-
 const emit = defineEmits(["task-added"]);
 
 onMounted(async () => {
   await fetchStatuses();
-
 });
 </script>
 
@@ -167,8 +164,8 @@ onMounted(async () => {
                 v-model="newTodo.status"
                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-200"
               >
-                <option v-for="status in statuses" :value="status">
-                  {{ status }}
+                <option v-for="status in statuses" :value="status.name">
+                  {{ status.name }}
                 </option>
               </select>
             </div>
