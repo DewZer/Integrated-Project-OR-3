@@ -65,7 +65,7 @@ const addTodo = async () => {
     return;
   }
 
-  const todo = { ...newTodo.value, statusName: newTodo.value.status };
+  const todo = { ...newTodo.value, status: newTodo.value.status };
   delete todo.status;
 
   if (!todo.description) {

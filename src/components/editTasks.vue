@@ -236,7 +236,7 @@ onMounted(async () => {
               <select
                 v-if="statuses.length > 0"
                 id="status"
-                v-model="selectedTodo.statusName"
+                v-model="selectedTodo.status"
                 class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
               >
                 <option v-for="status in statuses" :value="status">

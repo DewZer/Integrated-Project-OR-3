@@ -188,12 +188,12 @@ onMounted(() => {
               <div
                 class="rounded-full text-center px-2 py-1"
                 :class="
-                  todo.statusName === 'No Status'
+                  todo.status === 'No Status'
                     ? 'bg-gray-200 text-gray-800'
                     : 'bg-blue-200 text-blue-800'
                 "
               >
-                {{ todo.statusName }}
+                {{ todo.status }}
               </div>
             </td>
 

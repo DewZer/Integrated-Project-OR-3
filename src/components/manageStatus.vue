@@ -91,7 +91,7 @@ const fetchTasksByStatus = async (statusId) => {
   }
   const tasks = await response.json();
   return tasks.filter(
-    (task) => task.statusName === selectedDeletedStatus.value.name
+    (task) => task.status === selectedDeletedStatus.value.name
   );
 };
 
@@ -177,7 +177,7 @@ onMounted(async () => {
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 border-b border-gray-200"
             >
-              {{ status.statusDescription }}
+              {{ status.description }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"

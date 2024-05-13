@@ -43,8 +43,8 @@ const closeModalWithEdit = async () => {
   selectedStatus.value = {
     ...selectedStatus.value,
     name: selectedStatus.value.name.trim(),
-    statusDescription: selectedStatus.value.statusDescription
-      ? selectedStatus.value.statusDescription.trim()
+    description: selectedStatus.value.description
+      ? selectedStatus.value.description.trim()
       : null,
   };
 
@@ -128,10 +128,10 @@ onMounted(() => {
               </label>
               <textarea
                 id="status-description"
-                v-model="selectedStatus.statusDescription"
+                v-model="selectedStatus.description"
                 class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200 mt-2"
                 :placeholder="
-                  selectedStatus.statusDescription
+                  selectedStatus.description
                     ? ''
                     : 'No description provided'
                 "
