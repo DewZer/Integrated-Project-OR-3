@@ -16,8 +16,8 @@ const isSaveButtonDisabled = ref(true);
 
 const fetchDataById = async (id) => {
   try {
-    // const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
+    const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
+    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
 
     if (!response.ok) {
       throw new Error("No status found with this ID");
@@ -43,8 +43,8 @@ const closeModalWithEdit = async () => {
   selectedStatus.value = {
     ...selectedStatus.value,
     name: selectedStatus.value.name.trim(),
-    statusDescription: selectedStatus.value.statusDescription
-      ? selectedStatus.value.statusDescription.trim()
+    description: selectedStatus.value.description
+      ? selectedStatus.value.description.trim()
       : null,
   };
 
@@ -59,10 +59,10 @@ const closeModalWithEdit = async () => {
   delete statusToUpdate.updatedOn;
 
   try {
-    const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
-    // const response = await fetch(
-    //   `http://localhost:8080/v2/statuses/${statusToUpdate.id}`,
-    //   {
+    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
+    const response = await fetch(
+      `http://localhost:8080/v2/statuses/${statusToUpdate.id}`,
+      {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -128,10 +128,10 @@ onMounted(() => {
               </label>
               <textarea
                 id="status-description"
-                v-model="selectedStatus.statusDescription"
+                v-model="selectedStatus.description"
                 class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200 mt-2"
                 :placeholder="
-                  selectedStatus.statusDescription
+                  selectedStatus.description
                     ? ''
                     : 'No description provided'
                 "

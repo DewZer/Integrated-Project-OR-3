@@ -48,8 +48,8 @@ const confirmDelete = async () => {
 };
 
 const deleteStatus = async (statusId, newStatusId) => {
-  // let url = `http://localhost:8080/v2/statuses/${statusId}`;
-  let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
+  let url = `http://localhost:8080/v2/statuses/${statusId}`;
+  // let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
   if (newStatusId) {
     url += `/${newStatusId}`;
   }
@@ -83,8 +83,8 @@ const confirmTransfer = async () => {
 
 const fetchTasksByStatus = async (statusId) => {
   const response = await fetch(
-    // `http://localhost:8080/v2/tasks?statusId=${statusId}`
-    `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
+    `http://localhost:8080/v2/tasks?statusId=${statusId}`
+    // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
   );
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -97,8 +97,8 @@ const fetchTasksByStatus = async (statusId) => {
 
 const fetchStatuses = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
-    // const response = await fetch("http://localhost:8080/v2/statuses");
+    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
+    const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
     }
@@ -177,7 +177,7 @@ onMounted(async () => {
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 border-b border-gray-200"
             >
-              {{ status.statusDescription }}
+              {{ status.description }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
