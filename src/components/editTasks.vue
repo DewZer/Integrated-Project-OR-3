@@ -17,10 +17,10 @@ const statuses = ref([]);
 
 const fetchStatuses = async () => {
   try {
-    const response = await fetch(`http://localhost:8080/v2/statuses`);
-    // const response = await fetch(
-    //   `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
-    // );
+    // const response = await fetch(`http://localhost:8080/v2/statuses`);
+    const response = await fetch(
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
+    );
 
     console.log("fetching statuses");
     if (!response.ok) {
@@ -38,8 +38,8 @@ const fetchStatuses = async () => {
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
-      `http://localhost:8080/v2/tasks/${id}`
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
+      // `http://localhost:8080/v2/tasks/${id}`
     );
 
     if (!response.ok) {
@@ -87,8 +87,8 @@ const closeModalWithEdit = async () => {
 
   try {
     const response = await fetch(
-      `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
+      // `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
       {
         method: "PUT",
         headers: {
@@ -236,7 +236,7 @@ onMounted(async () => {
               <select
                 v-if="statuses.length > 0"
                 id="status"
-                v-model="selectedTodo.statusName"
+                v-model="selectedTodo.status"
                 class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
               >
                 <option v-for="status in statuses" :value="status">

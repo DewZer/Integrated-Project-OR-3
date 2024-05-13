@@ -150,7 +150,7 @@ onMounted(() => {
               >
                 <label class="label">
                   <span class="label-text text-lg text-black">
-                    {{ selectedTodo.statusName }}
+                    {{ selectedTodo.status }}
                   </span>
                 </label>
               </div>
