@@ -12,29 +12,38 @@ const deleteButton = ref(null);
 const toast = useToast();
 
 const goToEdit = (id) => {
+  router.push({ path: `/task/${id}/edit` });
+};
+
+const goToView = (id) => {
   router.push({ path: `/task/${id}` });
+};
+const gotoManageStatus = () => {
+  router.push({ path: "/task/status" });
 };
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch(
-      "http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks"
-      // "http://localhost:8080/itb-kk/v1/tasks"
-    );
+    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
+    // const response = await fetch("http://localhost:8080/v2/tasks");
+
     const data = await response.json();
-    todos.value = data.sort(
-      (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
-    );
+    todos.value = data.sort((a, b) => a.id - b.id);
+    console.log(todos.value);
   } catch (error) {
     console.error("Error:", error);
   }
 };
 
+const truncateTitle = (title) => {
+  return title.length > 70 ? title.substring(0, 70) + "..." : title;
+};
+
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/itb-kk/v1/tasks/${id}`,
-      // `http://localhost:8080/itb-kk/v1/tasks/${id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
+      // `http://localhost:8080/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -94,10 +103,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto pt-4 px-4 py-16 flex flex-col items-center justify-center min-h-screen">
-
+  <div class="w-full flex flex-col items-start h-screen bg-slate-400">
     <div class="flex justify-center w-full mb-7 relative">
-      <span class="text-2xl md:text-3xl font-bold mb-3">
+      <span
+        class="text-2xl md:text-4xl font-bold mb-3 text-white pt-4 shadow-lg"
+      >
         ITBKK-Kradan Kanban
       </span>
       <span
@@ -105,66 +115,85 @@ onMounted(() => {
       ></span>
     </div>
 
-    <div>
-      <table class="table-lg style bg-gray-700 dark:bg-gray-700 text-lg w-full">
-        <thead class="bg-gray-200 w-full">
+    <div class="w-3/4 mx-auto">
+      <table
+        class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
+      >
+        <thead
+          class="text-white w-full bg-gradient-to-r from-pink-300 via-blue-200 to-purple-300"
+        >
           <tr>
-            <th class="w-1/3 text-black text-center">Title</th>
-            <th class="w-1/4 text-black text-center">Assignees</th>
-            <th class="w-1/4 text-black text-center">Status</th>
-            <th class="1/3 text-center">
+            <th class="w-1/3 text-center text-gray-800 py-2">Title</th>
+            <th class="w-1/4 text-center text-gray-800 py-2">Assignees</th>
+            <th class="w-1/4 text-center text-gray-800 py-2">Status</th>
+            <th class="1/3 text-center py-2">
               <button
                 @click="gotoAdd"
-                class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-lg"
+                class="itbkk-button-add btn btn-outline btn-success bg-green-200 btn-md"
               >
                 Add Task
               </button>
             </th>
-            <th></th>
+            <th>
+              <button
+                @click="gotoManageStatus"
+                class="itbkk-button-status btn btn-active btn-neutral btn-md hover:bg-blue-500 hover:text-white"
+              >
+                Manage Status
+              </button>
+            </th>
           </tr>
         </thead>
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
+          <!-- if no taask -->
           <tr
             v-if="todos.length === 0"
-            class="flex justify-center items-center min-h-screen hover"
+            class="justify-center items-center min-h-screen hover"
           >
             <td
               colspan="5"
-              class="1/3 px-6 py-4 whitespace-nowrap text-sm text-gray-800"
+              class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 h-20"
             >
-              No task
+              <h2 class="text-lg font-semibold text-gray-700">No tasks yet</h2>
             </td>
           </tr>
+
           <tr
             v-for="todo in todos"
             :key="todo.id"
             class="itbkk-item hover:bg-gray-100 transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-80"
           >
             <td
-              class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
-              @click="goToEdit(todo.id)"
+              class="itbkk-title px-6 py-4 whitespace-nowrap text-sm text-gray-800 cursor-pointer border-b border-gray-200"
+              @click="goToView(todo.id)"
             >
-              <div class="truncate text-md font-bold" :title="todo.title">
-                {{ todo.title }}
+              <div
+                class="truncate text-lg font-semibold text-blue-600"
+                :title="todo.title"
+              >
+                {{ truncateTitle(todo.title) }}
               </div>
             </td>
             <td
-              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic"
+              class="itbkk-assignees px-6 py-4 whitespace-nowrap text-sm text-black-500 italic text-gray-800 border-b border-gray-200 flex items-center justify-center"
             >
-              {{ todo.assignees ? todo.assignees : "Unassigned" }}
+              <span class="text-md font-medium text-green-600">
+                {{ todo.assignees ? todo.assignees : "Unassigned" }}
+              </span>
             </td>
             <td
-              class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+              class="itbkk-status px-6 py-4 whitespace-nowrap text-sm text-gray-800 border-b border-gray-200"
             >
               <div
-                class="rounded-full text-center"
-                :class="`status-${todo.status
-                  .toLowerCase()
-                  .replace(/[\s_]+/g, '-')}`"
-                style="padding: 8px; width: 100px; margin: auto"
+                class="rounded-full text-center px-2 py-1"
+                :class="
+                  todo.status === 'No Status'
+                    ? 'bg-gray-200 text-gray-800'
+                    : 'bg-blue-200 text-blue-800'
+                "
               >
-                {{ formatStatus(todo.status) }}
+                {{ todo.status }}
               </div>
             </td>
 
@@ -173,17 +202,17 @@ onMounted(() => {
             >
               <button
                 @click="openDeleteModal(todo.id)"
-                class="itbkk-button-action text-red-600 hover:text-red-900"
+                class="itbkk-button-action bg-red-500 text-white hover:bg-red-700 px-3 py-1 rounded"
               >
                 Delete
               </button>
             </td>
             <td
-              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"
             >
               <button
                 @click="goToEdit(todo.id)"
-                class="text-indigo-600 hover:text-indigo-900"
+                class="bg-indigo-500 text-white hover:bg-indigo-700 px-3 py-1 rounded"
               >
                 Edit
               </button>

@@ -5,40 +5,17 @@ import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 
 const selectedTodo = ref(null);
-const showEditModal = ref(false);
+const showViewModal = ref(false);
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
-let errorMessage = ref("");
-let assigneesText = ref("");
-const originalTodo = ref(null);
-const isSaveButtonDisabled = ref(true);
-const statuses = ref([]);
-
-const fetchStatuses = async () => {
-  try {
-    // const response = await fetch(`http://localhost:8080/v2/statuses`);
-    const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
-    );
-
-    console.log("fetching statuses");
-    if (!response.ok) {
-      throw new Error("Failed to fetch statuses");
-    }
-
-    const data = await response.json();
-    statuses.value = data.map((status) => status.name);
-    console.log(statuses.value);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+const assigneesText = ref("");
 
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
       `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
+
       // `http://localhost:8080/v2/tasks/${id}`
     );
 
@@ -47,66 +24,13 @@ const fetchDataById = async (id) => {
     }
     const data = await response.json();
     selectedTodo.value = data;
-    originalTodo.value = { ...data };
     assigneesText.value = data.assignees;
     console.log(selectedTodo.value);
-    showEditModal.value = true;
+    showViewModal.value = true;
   } catch (error) {
     console.error("Error:", error);
     alert("No task found with this ID");
     router.push({ path: "/task" });
-  }
-};
-
-const closeModalWithEdit = async () => {
-  // trim
-  selectedTodo.value.title = selectedTodo.value.title.trim();
-
-  if (selectedTodo.value.description) {
-    selectedTodo.value.description = selectedTodo.value.description.trim();
-  }
-  if (assigneesText.value) {
-    assigneesText.value = assigneesText.value.trim();
-  }
-
-  if (!selectedTodo.value.title) {
-    errorMessage.value = "Title is required";
-    return;
-  }
-
-  const todoToUpdate = { ...selectedTodo.value };
-
-  todoToUpdate.assignees = assigneesText.value;
-
-  if (!todoToUpdate.assignees) {
-    delete todoToUpdate.assignees;
-  }
-
-  delete todoToUpdate.createdOn;
-  delete todoToUpdate.updatedOn;
-
-  try {
-    const response = await fetch(
-      // `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(todoToUpdate),
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    toast.success("The task has been updated");
-    showEditModal.value = false;
-    await fetchDataById(todoToUpdate.id);
-    router.push({ path: "/task" });
-  } catch (error) {
-    console.error("Error:", error);
-    toast.error("The update was unsuccessful");
   }
 };
 
@@ -123,44 +47,16 @@ const getTimeZone = () => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-watch(showEditModal, (newVal) => {
+watch(showViewModal, (newVal) => {
   if (newVal) {
     openModal();
   }
 });
 
 const closeModal = () => {
-  showEditModal.value = false;
+  showViewModal.value = false;
   router.push({ path: "/task" });
 };
-
-function deepEqual(a, b) {
-  if (a === b) return true;
-
-  if (a instanceof Date && b instanceof Date)
-    return a.getTime() === b.getTime();
-
-  if (!a || !b || (typeof a !== "object" && typeof b !== "object"))
-    return a === b;
-
-  if (a.prototype !== b.prototype) return false;
-
-  let keys = Object.keys(a);
-  if (keys.length !== Object.keys(b).length) return false;
-
-  return keys.every((k) => deepEqual(a[k], b[k]));
-}
-
-watch(
-  [selectedTodo, assigneesText],
-  () => {
-    isSaveButtonDisabled.value =
-      !selectedTodo.value.title.trim() ||
-      (deepEqual(selectedTodo.value, originalTodo.value) &&
-        assigneesText.value === originalTodo.value.assignees);
-  },
-  { deep: true }
-);
 
 const formatDate = (dateString) => {
   const options = {
@@ -175,15 +71,27 @@ const formatDate = (dateString) => {
   return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
 
-onMounted(async () => {
-  await fetchStatuses();
+const formatStatus = (status) => {
+  switch (status) {
+    case "NO_STATUS":
+      return "No Status";
+    case "TO_DO":
+      return `To Do`;
+    case "DOING":
+      return `Doing`;
+    case "DONE":
+      return `Done`;
+  }
+};
+
+onMounted(() => {
   fetchDataById(route.params.id);
 });
 </script>
 
 <template>
   <div
-    v-if="showEditModal"
+    v-if="showViewModal"
     class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500"
   >
     <div
@@ -193,17 +101,19 @@ onMounted(async () => {
       <div class="bg-grey sm:p-6 sm:pb-4 flex-grow">
         <div class="sm:flex flex">
           <div class="text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <h3 class="text-lg leading-6 font-medium text-gray-200">
               <label for="title" class="label">
                 <span class="label-text text-2xl font-bold text-pink-400"
                   >Title</span
                 >
               </label>
-              <input
-                type="text"
-                v-model="selectedTodo.title"
-                class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
-              />
+              <div class="bg-gray-200 rounded-md">
+                <label class="label">
+                  <span class="label-text text-lg text-black">
+                    {{ selectedTodo.title }}
+                  </span>
+                </label>
+              </div>
             </h3>
 
             <div class="mt-2">
@@ -220,10 +130,12 @@ onMounted(async () => {
                 :class="[
                   'textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg',
                   {
-                    'bg-gray-300': selectedTodo.description,
+                    'bg-gray-500': selectedTodo.description,
                     'bg-gray-200': !selectedTodo.description,
                   },
                 ]"
+                disabled
+                style="color: black !important"
               ></textarea>
             </div>
 
@@ -233,16 +145,15 @@ onMounted(async () => {
                   >Status</span
                 >
               </label>
-              <select
-                v-if="statuses.length > 0"
-                id="status"
-                v-model="selectedTodo.status"
-                class="select select-bordered w-full text-md bg-gray-200 rounded-lg"
+              <div
+                class="bg-gray-200 rounded-md flex items-center justify-center"
               >
-                <option v-for="status in statuses" :value="status">
-                  {{ status }}
-                </option>
-              </select>
+                <label class="label">
+                  <span class="label-text text-lg text-black">
+                    {{ selectedTodo.status }}
+                  </span>
+                </label>
+              </div>
             </div>
 
             <div class="mt-2">
@@ -251,20 +162,24 @@ onMounted(async () => {
                   >Assignees</span
                 >
               </label>
-              <input
-                id="assignees"
-                v-model="assigneesText"
-                class="input input-bordered w-full bg-gray-200"
-                :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
-                :class="{ italic: !assigneesText }"
-              />
+              <div class="bg-gray-200 rounded-md">
+                <label class="label">
+                  <span class="label-text text-lg text-black">
+                    {{
+                      selectedTodo.assignees
+                        ? selectedTodo.assignees
+                        : "Unassigned"
+                    }}
+                  </span>
+                </label>
+              </div>
             </div>
 
             <div
               class="mt-2 bg-gray-500 rounded-md flex items-center justify-center"
             >
               <label for="status" class="label">
-                <span class="label-text text-md text-white text-lg"
+                <span class="label-text text-lg text-white"
                   >Timezone : {{ getTimeZone() }}</span
                 >
               </label>
@@ -298,14 +213,6 @@ onMounted(async () => {
           class="bg-grey-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t mt-3"
         >
           <button
-            @click="closeModalWithEdit"
-            type="button"
-            class="btn btn-outline btn-success ml-2 sm:ml-4"
-            :disabled="isSaveButtonDisabled"
-          >
-            Save
-          </button>
-          <button
             @click="closeModal"
             type="button"
             class="itbkk-button-cancel btn btn-outline btn-error"
@@ -317,10 +224,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.unassigned-style {
-  background-color: #f0f0f0; /* Light grey background */
-  color: #ccc; /* Grey text */
-}
-</style>
