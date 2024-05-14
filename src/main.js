@@ -18,12 +18,12 @@ const routes = [
   { path: '/task', component: tasks },
   { path: '/', redirect: '/task' },
   { path: '/:pathMatch(.*)*', redirect: '/task' },
-  { path: '/task/:id', component: viewTask, props: true, name: 'view-task' },
-  { path: '/task/add', component: newTask, props: true, name: 'new-task' },
-  { path: '/task/:id/edit', component: editTasks, props: true, name: 'edit-task' },
-  { path: '/task/status', component: ManageStatus, props: true, name: 'manage-status' },
-  { path: '/task/status/add', component: addStatus, props: true, name: 'add-status' },
-  { path: '/task/status/:id', component: editStatus, props: true, name: 'edit-status' },
+  { path: '/task/:id', component: viewTask, props: true, name: 'View Task' },
+  { path: '/task/add', component: newTask, props: true, name: 'Add Task' },
+  { path: '/task/:id/edit', component: editTasks, props: true, name: 'Edit Task' },
+  { path: '/task/status', component: ManageStatus, props: true, name: 'Manage Status' },
+  { path: '/task/status/add', component: addStatus, props: true, name: 'Add Status' },
+  { path: '/task/status/:id', component: editStatus, props: true, name: 'Edit Status' },
 
 ]
 
