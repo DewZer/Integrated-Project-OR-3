@@ -14,7 +14,6 @@ import ManageStatus from './components/manageStatus.vue';
 import addStatus from './components/addStatus.vue';
 import editStatus from './components/editStatus.vue';
 
-
 const routes = [
   { path: '/task', component: tasks },
   { path: '/', redirect: '/task' },
