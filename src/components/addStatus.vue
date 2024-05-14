@@ -17,7 +17,7 @@ const closeModal = () => {
 
 const addStatus = async () => {
       newStatus.value.name = newStatus.value.name?.trim();
-      newStatus.value.statusDescription = newStatus.value.statusDescription?.trim();
+      newStatus.value.description = newStatus.value.description?.trim();
   // const response = await fetch('http://localhost:8080/v2/statuses', {
   const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
     method: 'POST',
@@ -69,7 +69,7 @@ const addStatus = async () => {
                   <span class="label-text text-2xl text-green-400 font-bold">Description</span>
                 </label>
                 <textarea
-                  v-model="newStatus.statusDescription"
+                  v-model="newStatus.description"
                   placeholder="Description"
                   class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200"
                 ></textarea>
