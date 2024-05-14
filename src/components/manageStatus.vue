@@ -1,18 +1,15 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted , watch } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+
+
 const toast = useToast();
 const router = useRouter();
 let statuses = ref([]);
 const showDeleteModal = ref(false);
 let selectedDeletedStatus = ref(null);
-
-const openDeleteModal = (status) => {
-  selectedDeletedStatus.value = status;
-  showDeleteModal.value = true;
-};
-
+let selectedStatusTaskCount = ref(0);
 let showTransferModal = ref(false);
 let newStatus = ref(null);
 
@@ -28,19 +25,40 @@ const gotoEditStatus = (status) => {
   router.push({ path: `/task/status/${status.id}` });
 };
 
+
+const openDeleteModal = async (status) => {
+  try {
+    if (status) {
+      selectedDeletedStatus.value = status;
+      const tasks = await fetchTasksByStatus(status.id);
+      const isStatusInUse = tasks.length > 0;
+      console.log('tasks:', tasks );
+      if (isStatusInUse) {
+        showTransferModal.value = true;
+      } else {
+        showDeleteModal.value = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+
 const confirmDelete = async () => {
   try {
-    const tasks = await fetchTasksByStatus(selectedDeletedStatus.value.id);
-    const isStatusInUse = tasks.length > 0;
-    console.log(fetchTasksByStatus(selectedDeletedStatus.value.id));
-
-    if (isStatusInUse) {
-      showTransferModal.value = true;
-    } else {
-      await deleteStatus(selectedDeletedStatus.value.id);
-      showDeleteModal.value = false;
-      showTransferModal.value = false;
-      await fetchStatuses();
+    if (selectedDeletedStatus.value) {
+      const tasks = await fetchTasksByStatus(selectedDeletedStatus.value.id);
+      const isStatusInUse = tasks.length > 0;
+      if (isStatusInUse) {
+        showTransferModal.value = true;
+        showDeleteModal.value = false;
+      } else {
+        await deleteStatus(selectedDeletedStatus.value.id);
+        showDeleteModal.value = false;
+        showTransferModal.value = false;
+        await fetchStatuses();
+      }
     }
   } catch (error) {
     console.error("Error:", error);
@@ -116,6 +134,14 @@ onMounted(async () => {
     newStatus.value = noStatus.id;
   }
 });
+
+watch(selectedDeletedStatus, async (newStatus) => {
+  if (newStatus) {
+    const tasks = await fetchTasksByStatus(newStatus.id);
+    selectedStatusTaskCount.value = tasks.length;
+  }
+}, { immediate: true });
+
 </script>
 <template>
   <div></div>
@@ -224,7 +250,7 @@ onMounted(async () => {
         class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
       >
         <div
-          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full border-red-400 border-2"
         >
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="flex flex-col items-center justify-center text-center">
@@ -273,15 +299,15 @@ onMounted(async () => {
         class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
       >
         <div
-          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full border-red-400 border-2 "
         >
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="flex flex-col items-center justify-center text-center">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
                 The status "{{ selectedDeletedStatus.name }}" is currently in
-                use by a {{selectedDeletedStatus.length}} task. Please select a new status for these tasks.
+                use {{selectedStatusTaskCount}} task. Please select a new status for these tasks.
               </h3>
-              <select v-model="newStatus" class="mt-4">
+              <select v-model="newStatus" class="mt-4 bg-gray-200 rounded-md">
                 <option
                   v-for="status in statuses"
                   :value="status.id"

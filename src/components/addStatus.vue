@@ -19,6 +19,11 @@ const addStatus = async () => {
       newStatus.value.name = newStatus.value.name?.trim();
       newStatus.value.description = newStatus.value.description?.trim();
   // const response = await fetch('http://localhost:8080/v2/statuses', {
+
+    if (newStatus.value.description === '') {
+    newStatus.value.description = null;
+  }
+
   const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
     method: 'POST',
     headers: {
