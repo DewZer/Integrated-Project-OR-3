@@ -22,14 +22,14 @@ const fetchStatuses = async () => {
       `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
     );
 
-    console.log("fetching statuses");
+    // console.log("fetching statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
     }
 
     const data = await response.json();
     statuses.value = data.map((status) => status.name);
-    console.log(statuses.value);
+    // console.log(statuses.value);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -49,7 +49,7 @@ const fetchDataById = async (id) => {
     selectedTodo.value = data;
     originalTodo.value = { ...data };
     assigneesText.value = data.assignees;
-    console.log(selectedTodo.value);
+    // console.log(selectedTodo.value);
     showEditModal.value = true;
   } catch (error) {
     console.error("Error:", error);

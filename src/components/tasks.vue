@@ -2,6 +2,7 @@
 import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+// const url = import.meta.env.BASEURL;
 
 const showDeleteModal = ref(false);
 const selectedDeletedTodo = ref(null);
@@ -29,7 +30,7 @@ const fetchTodos = async () => {
 
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
-    console.log(todos.value);
+    // console.log(todos.value);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -42,8 +43,8 @@ const truncateTitle = (title) => {
 const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
       // `http://localhost:8080/v2/tasks/${id}`,
+      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
@@ -53,12 +54,15 @@ const deleteTodoById = async (id) => {
       toast.success("The task has been deleted");
     } else if (response.status === 404) {
       toast.error("An error has occurred, the task does not exist.");
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
     } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     showDeleteModal.value = false;
     selectedDeletedTodo.value = null;
-    await fetchTodos(); // Add await here
+    await fetchTodos();
   } catch (error) {
     console.error("Error:", error);
   }
@@ -84,18 +88,6 @@ const gotoAdd = () => {
   router.push({ path: "/task/add" });
 };
 
-const formatStatus = (status) => {
-  switch (status) {
-    case "NO_STATUS":
-      return "No Status";
-    case "TO_DO":
-      return `To Do`;
-    case "DOING":
-      return `Doing`;
-    case "DONE":
-      return `Done`;
-  }
-};
 
 onMounted(() => {
   fetchTodos();
@@ -103,7 +95,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col items-start h-screen bg-slate-400">
+  <div class="w-full flex flex-col items-start h-screen bg-slate-400 overflow-auto">
     <div class="flex justify-center w-full mb-7 relative">
       <span
         class="text-2xl md:text-4xl font-bold mb-3 text-white pt-4 shadow-lg"
