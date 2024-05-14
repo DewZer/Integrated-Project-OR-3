@@ -12,7 +12,7 @@ let newTodo = ref({
   title: "",
   description: "",
   assignees: "",
-  status: "No Status",
+  status: "no status",
 });
 
 const statuses = ref([]);
@@ -22,19 +22,6 @@ const closeModal = () => {
   showAddModal.value = false;
   router.push("/task");
 };
-
-// const formatStatus = (status) => {
-//   switch (status) {
-//     case "NO_STATUS":
-//       return "No Status";
-//     case "TO_DO":
-//       return `To Do`;
-//     case "DOING":
-//       return `Doing`;
-//     case "DONE":
-//       return `Done`;
-//   }
-// };
 
 const fetchStatuses = async () => {
   try {

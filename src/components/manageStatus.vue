@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted , watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-
+import { computed } from "vue";
 
 const toast = useToast();
 const router = useRouter();
@@ -25,14 +25,13 @@ const gotoEditStatus = (status) => {
   router.push({ path: `/task/status/${status.id}` });
 };
 
-
 const openDeleteModal = async (status) => {
   try {
     if (status) {
       selectedDeletedStatus.value = status;
       const tasks = await fetchTasksByStatus(status.id);
       const isStatusInUse = tasks.length > 0;
-      console.log('tasks:', tasks );
+      // console.log("tasks:", tasks);
       if (isStatusInUse) {
         showTransferModal.value = true;
       } else {
@@ -43,7 +42,6 @@ const openDeleteModal = async (status) => {
     console.error("Error:", error);
   }
 };
-
 
 const confirmDelete = async () => {
   try {
@@ -81,6 +79,9 @@ const deleteStatus = async (statusId, newStatusId) => {
     } else {
       toast.error("Failed to delete status");
     }
+    setTimeout(() => {
+      location.reload();
+    }, 1500);
     throw new Error("Failed to delete status");
   }
   toast.success("The status has been deleted");
@@ -115,7 +116,9 @@ const fetchTasksByStatus = async (statusId) => {
 
 const fetchStatuses = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses");
+    const response = await fetch(
+    "http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses"
+    );
     // const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
@@ -135,13 +138,23 @@ onMounted(async () => {
   }
 });
 
-watch(selectedDeletedStatus, async (newStatus) => {
-  if (newStatus) {
-    const tasks = await fetchTasksByStatus(newStatus.id);
-    selectedStatusTaskCount.value = tasks.length;
-  }
-}, { immediate: true });
+// count tasks for the selected status
+watch(
+  selectedDeletedStatus,
+  async (newStatus) => {
+    if (newStatus) {
+      const tasks = await fetchTasksByStatus(newStatus.id);
+      selectedStatusTaskCount.value = tasks.length;
+    }
+  },
+  { immediate: true }
+);
 
+const availableStatuses = computed(() => {
+  return statuses.value.filter(
+    (status) => status.id !== selectedDeletedStatus.value?.id
+  );
+});
 </script>
 <template>
   <div></div>
@@ -203,7 +216,7 @@ watch(selectedDeletedStatus, async (newStatus) => {
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 border-b border-gray-200"
             >
-              {{ status.description ? '' : 'No description provided' }}
+              {{ status.description ? "" : "No description provided" }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
@@ -299,17 +312,18 @@ watch(selectedDeletedStatus, async (newStatus) => {
         class="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-slate-500 bg-opacity-25"
       >
         <div
-          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full border-red-400 border-2 "
+          class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full border-red-400 border-2"
         >
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="flex flex-col items-center justify-center text-center">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
                 The status "{{ selectedDeletedStatus.name }}" is currently in
-                use {{selectedStatusTaskCount}} task. Please select a new status for these tasks.
+                use {{ selectedStatusTaskCount }} task. Please select a new
+                status for these tasks.
               </h3>
               <select v-model="newStatus" class="mt-4 bg-gray-200 rounded-md">
                 <option
-                  v-for="status in statuses"
+                  v-for="status in availableStatuses"
                   :value="status.id"
                   :key="status.id"
                 >
