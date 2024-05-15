@@ -25,7 +25,7 @@ const fetchDataById = async (id) => {
     const data = await response.json();
     selectedTodo.value = data;
     assigneesText.value = data.assignees;
-    console.log(selectedTodo.value);
+    // console.log(selectedTodo.value);
     showViewModal.value = true;
   } catch (error) {
     console.error("Error:", error);
@@ -71,18 +71,6 @@ const formatDate = (dateString) => {
   return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
 
-const formatStatus = (status) => {
-  switch (status) {
-    case "NO_STATUS":
-      return "No Status";
-    case "TO_DO":
-      return `To Do`;
-    case "DOING":
-      return `Doing`;
-    case "DONE":
-      return `Done`;
-  }
-};
 
 onMounted(() => {
   fetchDataById(route.params.id);

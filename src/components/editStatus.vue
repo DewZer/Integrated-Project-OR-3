@@ -26,7 +26,7 @@ const fetchDataById = async (id) => {
     selectedStatus.value = reactive(data);
     originalStatus.value = reactive({ ...data });
     showEditModal.value = true;
-    console.log(selectedStatus.value);
+    // console.log(selectedStatus.value);
   } catch (error) {
     console.error("Error:", error);
     alert("No status found with this ID");
