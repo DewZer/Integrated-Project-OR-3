@@ -8,12 +8,10 @@ const toast = useToast();
 const showAddModal = ref(true);
 const newStatus = ref({ name: '', description: '' });
 
-
 const closeModal = () => {
   showAddModal.value = false;
   router.push('/task/status');
 };
-
 
 const addStatus = async () => {
       newStatus.value.name = newStatus.value.name?.trim();

@@ -24,7 +24,6 @@ const routes = [
   { path: '/task/status', component: ManageStatus, props: true, name: 'Manage Status' },
   { path: '/task/status/add', component: addStatus, props: true, name: 'Add Status' },
   { path: '/task/status/:id', component: editStatus, props: true, name: 'Edit Status' },
-
 ]
 
 const router = createRouter({
