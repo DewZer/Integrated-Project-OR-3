@@ -117,7 +117,7 @@ const fetchTasksByStatus = async (statusId) => {
 const fetchStatuses = async () => {
   try {
     const response = await fetch(
-    "http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses"
+      "http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses"
     );
     // const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
@@ -214,9 +214,14 @@ const availableStatuses = computed(() => {
               {{ status.name }}
             </td>
             <td
-              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 border-b border-gray-200"
+              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium border-b border-gray-200"
+              :class="status.description ? 'text-green-600' : 'text-red-600'"
             >
-              {{ status.description ? "" : "No description provided" }}
+              {{
+                status.description
+                  ? status.description
+                  : "No description provided"
+              }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
