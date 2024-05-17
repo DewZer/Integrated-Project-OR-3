@@ -25,8 +25,9 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
+    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
     // const response = await fetch("http://localhost:8080/v2/tasks");
+    const response = await fetch("http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks");
 
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
@@ -44,7 +45,8 @@ const deleteTodoById = async (id) => {
   try {
     const response = await fetch(
       // `http://localhost:8080/v2/tasks/${id}`,
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
+      `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
