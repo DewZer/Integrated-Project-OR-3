@@ -124,6 +124,7 @@ onMounted(async () => {
                 v-model="newTodo.title"
                 class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                 placeholder="Title"
+                maxlength="100"
               />
             </h3>
 
@@ -137,6 +138,7 @@ onMounted(async () => {
                 v-model="newTodo.description"
                 placeholder="Description"
                 class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200"
+                maxlength="500"
               ></textarea>
             </div>
 
@@ -168,6 +170,7 @@ onMounted(async () => {
                 v-model="newTodo.assignees"
                 class="input input-bordered w-full bg-gray-200"
                 placeholder="Assignees"
+                maxlength="30"
               />
             </div>
           </div>

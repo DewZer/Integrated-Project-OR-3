@@ -203,6 +203,7 @@ onMounted(async () => {
                 type="text"
                 v-model="selectedTodo.title"
                 class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
+                maxlength="100"
               />
             </h3>
 
@@ -224,6 +225,7 @@ onMounted(async () => {
                     'bg-gray-200': !selectedTodo.description,
                   },
                 ]"
+                maxlength="500"
               ></textarea>
             </div>
 
@@ -257,6 +259,7 @@ onMounted(async () => {
                 class="input input-bordered w-full bg-gray-200"
                 :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
                 :class="{ italic: !assigneesText }"
+                maxlength="30"
               />
             </div>
 

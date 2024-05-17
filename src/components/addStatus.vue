@@ -65,6 +65,7 @@ const addStatus = async () => {
                   v-model="newStatus.name"
                   class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                   placeholder="Status"
+                  maxlength="50"
                 />
               </h3>
   
@@ -76,6 +77,7 @@ const addStatus = async () => {
                   v-model="newStatus.description"
                   placeholder="Description"
                   class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200"
+                  maxlength="200"
                 ></textarea>
               </div>
             </div>
