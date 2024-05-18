@@ -122,6 +122,7 @@ onMounted(() => {
                 type="text"
                 class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                 placeholder="Status"
+                maxlength="50"
               />
 
               <label for="status-description" class="label mt-4">
@@ -138,6 +139,7 @@ onMounted(() => {
                     ? ''
                     : 'No description provided'
                 "
+                maxlength="200"
               ></textarea>
               <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
             </h3>
