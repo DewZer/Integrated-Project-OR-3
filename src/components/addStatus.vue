@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
+const API_ROOT = import.meta.env.VITE_BASE_URL;
+
 
 const router = useRouter();
 const toast = useToast();
@@ -21,7 +23,10 @@ const addStatus = async () => {
     newStatus.value.description = null;
   }
   // const response = await fetch('http://localhost:8080/v2/statuses', {
-  const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
+  // const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
+    // const response = await fetch('http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses', {
+  const response = await fetch(`${API_ROOT}/v2/statuses`, {
+
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

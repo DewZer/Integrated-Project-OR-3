@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick, computed } from "vue";
 import { watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+const API_ROOT = import.meta.env.VITE_BASE_URL;
 
 const selectedTodo = ref(null);
 const showViewModal = ref(false);
@@ -14,9 +15,10 @@ const assigneesText = ref("");
 const fetchDataById = async (id) => {
   try {
     const response = await fetch(
-      `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
-
+      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
       // `http://localhost:8080/v2/tasks/${id}`
+      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`
+      `${API_ROOT}/v2/tasks/${id}`
     );
 
     if (!response.ok) {
