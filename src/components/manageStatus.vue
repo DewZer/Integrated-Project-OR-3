@@ -3,6 +3,8 @@ import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import { computed } from "vue";
+const API_ROOT = import.meta.env.VITE_BASE_URL;
+
 
 const toast = useToast();
 const router = useRouter();
@@ -64,8 +66,9 @@ const confirmDelete = async () => {
 };
 
 const deleteStatus = async (statusId, newStatusId) => {
-  // let url = `http://localhost:8080/v2/statuses/${statusId}`;
-  let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
+
+  let url = `${API_ROOT}/v2/statuses/${statusId}`;
+
   if (newStatusId) {
     url += `/${newStatusId}`;
   }
@@ -102,8 +105,8 @@ const confirmTransfer = async () => {
 
 const fetchTasksByStatus = async (statusId) => {
   const response = await fetch(
-    // `http://localhost:8080/v2/tasks?statusId=${statusId}`
-    `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
+
+    `${API_ROOT}/v2/tasks?statusId=${statusId}`
   );
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -117,9 +120,9 @@ const fetchTasksByStatus = async (statusId) => {
 const fetchStatuses = async () => {
   try {
     const response = await fetch(
-    "http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses"
+      `${API_ROOT}/v2/statuses`
+
     );
-    // const response = await fetch("http://localhost:8080/v2/statuses");
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");
     }
@@ -214,9 +217,14 @@ const availableStatuses = computed(() => {
               {{ status.name }}
             </td>
             <td
-              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 border-b border-gray-200"
+              class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium border-b border-gray-200"
+              :class="status.description ? 'text-green-600' : 'text-red-600'"
             >
-              {{ status.description ? "" : "No description provided" }}
+              {{
+                status.description
+                  ? status.description
+                  : "No description provided"
+              }}
             </td>
             <td
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
