@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick, computed } from "vue";
 import { watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+const API_ROOT = import.meta.env.VITE_BASE_URL;
 
 const selectedTodo = ref(null);
 const showEditModal = ref(false);
@@ -17,12 +18,10 @@ const statuses = ref([]);
 
 const fetchStatuses = async () => {
   try {
-    // const response = await fetch(`http://localhost:8080/v2/statuses`);
-    // const response = await fetch(
-    //   `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses`
-    // );
+
     const response = await fetch(
-      `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses`
+      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses`
+      `${API_ROOT}/v2/statuses`
     );
     // console.log("fetching statuses");
     if (!response.ok) {
@@ -42,7 +41,8 @@ const fetchDataById = async (id) => {
     const response = await fetch(
       // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`
       // `http://localhost:8080/v2/tasks/${id}`
-      `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`
+      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`
+      `${API_ROOT}/v2/tasks/${id}`
 
     );
 
@@ -93,7 +93,8 @@ const closeModalWithEdit = async () => {
     const response = await fetch(
       // `http://localhost:8080/v2/tasks/${todoToUpdate.id}`,
       // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${todoToUpdate.id}`,
-      `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${todoToUpdate.id}`,
+      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${todoToUpdate.id}`,
+      `${API_ROOT}/v2/tasks/${todoToUpdate.id}`,
       {
         method: "PUT",
         headers: {

@@ -4,6 +4,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import { reactive, watchEffect } from "vue";
 import { isEqual } from "lodash";
+const API_ROOT = import.meta.env.VITE_BASE_URL;
+
 
 let selectedStatus = ref(null);
 let originalStatus = ref(null);
@@ -16,9 +18,8 @@ const isSaveButtonDisabled = ref(true);
 
 const fetchDataById = async (id) => {
   try {
-    // const response = await fetch(`http://localhost:8080/v2/statuses/${id}`);
-    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${id}`);
-    const response = await fetch(`http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses/${id}`);
+
+    const response = await fetch(`${API_ROOT}/v2/statuses/${id}`);
 
     if (!response.ok) {
       throw new Error("No status found with this ID");
@@ -60,11 +61,11 @@ const closeModalWithEdit = async () => {
   delete statusToUpdate.updatedOn;
 
   try {
-    const response = await fetch(`http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses/${statusToUpdate.id}`, {
-    // const response = await fetch(`http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusToUpdate.id}`, {
-    // const response = await fetch(
-    //   `http://localhost:8080/v2/statuses/${statusToUpdate.id}`,
-    //   {
+
+    // const response = await fetch(`http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses/${statusToUpdate.id}`, {
+    const response = await fetch(`${API_ROOT}/v2/statuses/${statusToUpdate.id}`, {
+
+
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -3,6 +3,8 @@ import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import { computed } from "vue";
+const API_ROOT = import.meta.env.VITE_BASE_URL;
+
 
 const toast = useToast();
 const router = useRouter();
@@ -64,9 +66,8 @@ const confirmDelete = async () => {
 };
 
 const deleteStatus = async (statusId, newStatusId) => {
-  // let url = `http://localhost:8080/v2/statuses/${statusId}`;
-  // let url = `http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses/${statusId}`;
-  let url = `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses/${statusId}`;
+
+  let url = `${API_ROOT}/v2/statuses/${statusId}`;
 
   if (newStatusId) {
     url += `/${newStatusId}`;
@@ -104,9 +105,8 @@ const confirmTransfer = async () => {
 
 const fetchTasksByStatus = async (statusId) => {
   const response = await fetch(
-    // `http://localhost:8080/v2/tasks?statusId=${statusId}`
-    // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks?statusId=${statusId}`
-    `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks?statusId=${statusId}`
+
+    `${API_ROOT}/v2/tasks?statusId=${statusId}`
   );
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -120,9 +120,8 @@ const fetchTasksByStatus = async (statusId) => {
 const fetchStatuses = async () => {
   try {
     const response = await fetch(
-      // "http://localhost:8080/v2/statuses"
-      // "http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses"
-      "http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses"
+      `${API_ROOT}/v2/statuses`
+
     );
     if (!response.ok) {
       throw new Error("Failed to fetch statuses");

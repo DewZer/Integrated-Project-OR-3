@@ -2,7 +2,7 @@
 import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-// const url = import.meta.env.BASEURL;
+const API_ROOT = import.meta.env.VITE_BASE_URL;
 
 const showDeleteModal = ref(false);
 const selectedDeletedTodo = ref(null);
@@ -27,8 +27,8 @@ const fetchTodos = async () => {
   try {
     // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
     // const response = await fetch("http://localhost:8080/v2/tasks");
-    const response = await fetch("http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks");
-
+    // const response = await fetch("http://intproj23.sit.kmutt.ac.th/or3/v2/tasks");
+    const response = await fetch(`${API_ROOT}/v2/tasks`);
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
     // console.log(todos.value);
@@ -46,7 +46,8 @@ const deleteTodoById = async (id) => {
     const response = await fetch(
       // `http://localhost:8080/v2/tasks/${id}`,
       // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
-      `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`,
+      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`,
+      `${API_ROOT}/v2/tasks/${id}`,
       {
         method: "DELETE",
       }
