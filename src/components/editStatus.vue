@@ -55,27 +55,35 @@ const closeModalWithEdit = async () => {
     return;
   }
 
+
+  const responseStatuses = await fetch(`${API_ROOT}/v2/statuses`);
+  const existingStatuses = await responseStatuses.json();
+
+  // check status name is unique
+  if (existingStatuses.some(status => status.name === selectedStatus.value.name && status.id !== selectedStatus.value.id)) {
+    toast.error("Status name must be unique");
+
+    return;
+  }
+
   const statusToUpdate = { ...selectedStatus.value };
 
   delete statusToUpdate.createdOn;
   delete statusToUpdate.updatedOn;
 
   try {
-
-    // const response = await fetch(`http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses/${statusToUpdate.id}`, {
     const response = await fetch(`${API_ROOT}/v2/statuses/${statusToUpdate.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(statusToUpdate),
+    });
 
-
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(statusToUpdate),
-      }
-    );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     toast.success("The status has been updated");
     showEditModal.value = false;
     await fetchDataById(statusToUpdate.id);

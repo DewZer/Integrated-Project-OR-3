@@ -133,6 +133,13 @@ const fetchStatuses = async () => {
   }
 };
 
+const truncateDescription = (description, maxLength = 50) => {
+  return description.length > maxLength
+    ? description.substring(0, maxLength) + '...'
+    : description;
+};
+
+
 onMounted(async () => {
   await fetchStatuses();
   const noStatus = statuses.value.find((status) => status.name === "No Status");
@@ -222,7 +229,7 @@ const availableStatuses = computed(() => {
             >
               {{
                 status.description
-                  ? status.description
+                  ? truncateDescription(status.description, 50)
                   : "No description provided"
               }}
             </td>

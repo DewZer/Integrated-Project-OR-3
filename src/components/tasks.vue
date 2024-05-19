@@ -9,6 +9,8 @@ const selectedDeletedTodo = ref(null);
 const todos = ref([]);
 const router = useRouter();
 const deleteButton = ref(null);
+let isSortedByStatus = false;
+let originalTasks = [];
 
 const toast = useToast();
 
@@ -25,16 +27,22 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
-    // const response = await fetch("http://localhost:8080/v2/tasks");
-    // const response = await fetch("http://intproj23.sit.kmutt.ac.th/or3/v2/tasks");
     const response = await fetch(`${API_ROOT}/v2/tasks`);
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
-    // console.log(todos.value);
+    originalTasks = [...todos.value];
   } catch (error) {
     console.error("Error:", error);
   }
+};
+
+const sortTasksByStatus = () => {
+  if (isSortedByStatus) {
+    todos.value = [...originalTasks];
+  } else {
+    todos.value.sort((a, b) => a.status.localeCompare(b.status));
+  }
+  isSortedByStatus = !isSortedByStatus;
 };
 
 const truncateTitle = (title) => {
@@ -43,15 +51,9 @@ const truncateTitle = (title) => {
 
 const deleteTodoById = async (id) => {
   try {
-    const response = await fetch(
-      // `http://localhost:8080/v2/tasks/${id}`,
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
-      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`,
-      `${API_ROOT}/v2/tasks/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const response = await fetch(`${API_ROOT}/v2/tasks/${id}`, {
+      method: "DELETE",
+    });
 
     if (response.ok) {
       toast.success("The task has been deleted");
@@ -91,14 +93,15 @@ const gotoAdd = () => {
   router.push({ path: "/task/add" });
 };
 
-
 onMounted(() => {
   fetchTodos();
 });
 </script>
 
 <template>
-  <div class="w-full flex flex-col items-start h-screen bg-slate-400 overflow-auto">
+  <div
+    class="w-full flex flex-col items-start h-screen bg-slate-400 overflow-auto"
+  >
     <div class="flex justify-center w-full mb-7 relative">
       <span
         class="text-2xl md:text-4xl font-bold mb-3 text-white pt-4 shadow-lg"
@@ -120,7 +123,15 @@ onMounted(() => {
           <tr>
             <th class="w-1/3 text-center text-gray-800 py-2">Title</th>
             <th class="w-1/4 text-center text-gray-800 py-2">Assignees</th>
-            <th class="w-1/4 text-center text-gray-800 py-2">Status</th>
+            <th class="w-1/4 text-center text-gray-800 py-2">
+              <button
+                @click="sortTasksByStatus"
+                class="px-4 py-2 font-bold text-white rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                :class="isSortedByStatus ? 'bg-green-500' : 'bg-blue-500'"
+              >
+                Status
+              </button>
+            </th>
             <th class="1/3 text-center py-2">
               <button
                 @click="gotoAdd"
@@ -141,7 +152,7 @@ onMounted(() => {
         </thead>
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <!-- if no taask -->
+          <!-- if no task -->
           <tr
             v-if="todos.length === 0"
             class="justify-center items-center min-h-screen hover"
