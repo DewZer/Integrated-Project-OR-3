@@ -12,6 +12,10 @@ const deleteButton = ref(null);
 let isSortedByStatus = false;
 let originalTasks = [];
 
+const filterStatus = ref([]);
+const filterStatusBoxVisible = ref(false);
+const displayedFilterStatus = ref([]);
+
 const toast = useToast();
 
 const goToEdit = (id) => {
@@ -93,6 +97,29 @@ const gotoAdd = () => {
   router.push({ path: "/task/add" });
 };
 
+// filter status
+const filterTasksByStatus = (event) => {
+  // Step 2
+  const status = event.target.value.trim();
+  if (status && !filterStatus.value.includes(status)) {
+    filterStatus.value.push(status);
+    displayedFilterStatus.value = [...filterStatus.value]; // Update the displayed filter status
+    todos.value = originalTasks.filter((task) =>
+      filterStatus.value.includes(task.status)
+    ); // Filter tasks that have a status in the input
+  }
+  event.target.value = "";
+};
+
+const cancelFilter = (status) => {
+  // Step 3
+  filterStatus.value = filterStatus.value.filter((s) => s !== status);
+  displayedFilterStatus.value = [...filterStatus.value];
+  todos.value = filterStatus.value.length
+    ? originalTasks.filter((task) => filterStatus.value.includes(task.status))
+    : [...originalTasks];
+};
+
 onMounted(() => {
   fetchTodos();
 });
@@ -113,9 +140,31 @@ onMounted(() => {
       ></span>
     </div>
 
-    <div class="w-3/4 mx-auto">
+    <div class="w-3/4 mx-auto flex flex-col items-start space-y-4">
+      <!-- filter search box -->
+      <input
+    @keyup.enter="filterTasksByStatus"
+    placeholder="Filter by status"
+    class="px-4 py-2 rounded w-[30%] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+  >
+  <div class="flex flex-wrap items-center w-[70%]">
+    <div
+      v-for="status in displayedFilterStatus"
+      :key="status"
+      class="flex items-center bg-blue-200 rounded-full px-3 py-1 text-sm font-semibold text-blue-700 m-1"
+    >
+      {{ status }}
+      <button
+        @click="cancelFilter(status)"
+        class="ml-2 text-xs bg-red-500 text-white rounded-full px-2 py-1 focus:outline-none"
+      >
+        x
+      </button>
+    </div>
+  </div>
+
       <table
-        class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
+      class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
       >
         <thead
           class="text-white w-full bg-gradient-to-r from-pink-300 via-blue-200 to-purple-300"
