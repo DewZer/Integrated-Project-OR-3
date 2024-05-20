@@ -9,6 +9,12 @@ const selectedDeletedTodo = ref(null);
 const todos = ref([]);
 const router = useRouter();
 const deleteButton = ref(null);
+let isSortedByStatus = false;
+let originalTasks = [];
+
+const filterStatus = ref([]);
+const filterStatusBoxVisible = ref(false);
+const displayedFilterStatus = ref([]);
 
 const toast = useToast();
 
@@ -25,13 +31,10 @@ const gotoManageStatus = () => {
 
 const fetchTodos = async () => {
   try {
-    // const response = await fetch("http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks");
-    // const response = await fetch("http://localhost:8080/v2/tasks");
-    // const response = await fetch("http://intproj23.sit.kmutt.ac.th/or3/v2/tasks");
     const response = await fetch(`${API_ROOT}/v2/tasks`);
     const data = await response.json();
     todos.value = data.sort((a, b) => a.id - b.id);
-    // console.log(todos.value);
+    originalTasks = [...todos.value];
   } catch (error) {
     console.error("Error:", error);
   }
@@ -43,15 +46,9 @@ const truncateTitle = (title) => {
 
 const deleteTodoById = async (id) => {
   try {
-    const response = await fetch(
-      // `http://localhost:8080/v2/tasks/${id}`,
-      // `http://ip23or3.sit.kmutt.ac.th:8080/v2/tasks/${id}`,
-      // `http://intproj23.sit.kmutt.ac.th:8080/or3/v2/tasks/${id}`,
-      `${API_ROOT}/v2/tasks/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const response = await fetch(`${API_ROOT}/v2/tasks/${id}`, {
+      method: "DELETE",
+    });
 
     if (response.ok) {
       toast.success("The task has been deleted");
@@ -91,6 +88,42 @@ const gotoAdd = () => {
   router.push({ path: "/task/add" });
 };
 
+// filter status
+const filterTasksByStatus = (event) => {
+  // Step 2
+  const status = event.target.value.trim();
+  if (status && !filterStatus.value.includes(status)) {
+    filterStatus.value.push(status);
+    displayedFilterStatus.value = [...filterStatus.value];
+    todos.value = originalTasks.filter((task) =>
+      filterStatus.value.includes(task.status)
+    );
+  }
+  event.target.value = "";
+};
+
+const cancelFilter = (status) => {
+  filterStatus.value = filterStatus.value.filter((s) => s !== status);
+  displayedFilterStatus.value = [...filterStatus.value];
+  todos.value = filterStatus.value.length
+    ? originalTasks.filter((task) => filterStatus.value.includes(task.status))
+    : [...originalTasks];
+};
+
+let sortDirection = 0;
+// sort status
+const sortTasksByStatus = () => {
+  if (sortDirection === 0) {
+    todos.value.sort((a, b) => a.status.localeCompare(b.status));
+    sortDirection = 1;
+  } else if (sortDirection === 1) {
+    todos.value.sort((a, b) => b.status.localeCompare(a.status));
+    sortDirection = -1;
+  } else {
+    todos.value = [...originalTasks];
+    sortDirection = 0;
+  }
+};
 
 onMounted(() => {
   fetchTodos();
@@ -98,7 +131,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col items-start h-screen bg-slate-400 overflow-auto">
+  <div
+    class="w-full flex flex-col items-start h-screen bg-slate-400 overflow-auto"
+  >
     <div class="flex justify-center w-full mb-7 relative">
       <span
         class="text-2xl md:text-4xl font-bold mb-3 text-white pt-4 shadow-lg"
@@ -110,7 +145,53 @@ onMounted(() => {
       ></span>
     </div>
 
-    <div class="w-3/4 mx-auto">
+    <div class="w-3/4 mx-auto flex flex-col items-start space-y-4">
+      <!-- filter search box -->
+      <div class="flex flex-wrap items-center justify-between w-[100%] space-x-*">
+      <input
+        @keyup.enter="filterTasksByStatus"
+        placeholder="Filter by status"
+        class="px-4 py-2 rounded w-[30%] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+      />
+      
+        <div
+          v-for="status in displayedFilterStatus"
+          :key="status"
+          class="flex items-center bg-blue-200 rounded-full px-3 py-1 text-sm font-semibold text-blue-700 m-1"
+        >
+          {{ status }}
+          <button
+            @click="cancelFilter(status)"
+            class="ml-2 text-xs bg-red-500 text-white rounded-full px-2 py-1 focus:outline-none"
+          >
+            x
+          </button>
+        </div>
+
+        <div
+          class="flex max-w-sm rounded-xl bg-gradient-to-tr from-pink-300 to-blue-300 p-0.5 shadow-lg"
+          :class="
+            isSortedByStatus
+              ? 'bg-gradient-to-tr from-red-600 to-pink-200'
+              : 'bg-gradient-to-tr from-pink-300 to-blue-300'
+          "
+        >
+          <button
+            @click="sortTasksByStatus"
+            class="flex-1 font-bold text-lg bg-white px-4 py-2 rounded-xl"
+            :class="
+              sortDirection === 0
+                ? 'text-gray-500'
+                : sortDirection === 1
+                ? 'text-blue-600'
+                : 'text-red-600'
+            "
+          >
+            Sort By Status
+          </button>
+        </div>
+      </div>
+
       <table
         class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
       >
@@ -141,7 +222,7 @@ onMounted(() => {
         </thead>
         <!-- body -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <!-- if no taask -->
+          <!-- if no task -->
           <tr
             v-if="todos.length === 0"
             class="justify-center items-center min-h-screen hover"

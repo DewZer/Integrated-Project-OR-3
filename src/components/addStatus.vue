@@ -16,17 +16,25 @@ const closeModal = () => {
 };
 
 const addStatus = async () => {
-      newStatus.value.name = newStatus.value.name?.trim();
-      newStatus.value.description = newStatus.value.description?.trim();
+  newStatus.value.name = newStatus.value.name?.trim();
+  newStatus.value.description = newStatus.value.description?.trim();
 
-    if (newStatus.value.description === '') {
+  if (newStatus.value.description === '') {
     newStatus.value.description = null;
   }
-  // const response = await fetch('http://localhost:8080/v2/statuses', {
-  // const response = await fetch('http://ip23or3.sit.kmutt.ac.th:8080/v2/statuses', {
-    // const response = await fetch('http://intproj23.sit.kmutt.ac.th:8080/or3/v2/statuses', {
-  const response = await fetch(`${API_ROOT}/v2/statuses`, {
 
+  
+  const responseStatuses = await fetch(`${API_ROOT}/v2/statuses`);
+  const existingStatuses = await responseStatuses.json();
+
+  // status name is unique
+  if (existingStatuses.some(status => status.name === newStatus.value.name)) {
+    toast.error('Status name must be unique');
+    return;
+  }
+
+  // post new status
+  const response = await fetch(`${API_ROOT}/v2/statuses`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
