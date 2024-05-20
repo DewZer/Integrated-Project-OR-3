@@ -40,15 +40,6 @@ const fetchTodos = async () => {
   }
 };
 
-const sortTasksByStatus = () => {
-  if (isSortedByStatus) {
-    todos.value = [...originalTasks];
-  } else {
-    todos.value.sort((a, b) => a.status.localeCompare(b.status));
-  }
-  isSortedByStatus = !isSortedByStatus;
-};
-
 const truncateTitle = (title) => {
   return title.length > 70 ? title.substring(0, 70) + "..." : title;
 };
@@ -103,21 +94,35 @@ const filterTasksByStatus = (event) => {
   const status = event.target.value.trim();
   if (status && !filterStatus.value.includes(status)) {
     filterStatus.value.push(status);
-    displayedFilterStatus.value = [...filterStatus.value]; // Update the displayed filter status
+    displayedFilterStatus.value = [...filterStatus.value];
     todos.value = originalTasks.filter((task) =>
       filterStatus.value.includes(task.status)
-    ); // Filter tasks that have a status in the input
+    );
   }
   event.target.value = "";
 };
 
 const cancelFilter = (status) => {
-  // Step 3
   filterStatus.value = filterStatus.value.filter((s) => s !== status);
   displayedFilterStatus.value = [...filterStatus.value];
   todos.value = filterStatus.value.length
     ? originalTasks.filter((task) => filterStatus.value.includes(task.status))
     : [...originalTasks];
+};
+
+let sortDirection = 0;
+// sort status
+const sortTasksByStatus = () => {
+  if (sortDirection === 0) {
+    todos.value.sort((a, b) => a.status.localeCompare(b.status));
+    sortDirection = 1;
+  } else if (sortDirection === 1) {
+    todos.value.sort((a, b) => b.status.localeCompare(a.status));
+    sortDirection = -1;
+  } else {
+    todos.value = [...originalTasks];
+    sortDirection = 0;
+  }
 };
 
 onMounted(() => {
@@ -142,29 +147,53 @@ onMounted(() => {
 
     <div class="w-3/4 mx-auto flex flex-col items-start space-y-4">
       <!-- filter search box -->
+      <div class="flex flex-wrap items-center justify-between w-[100%] space-x-*">
       <input
-    @keyup.enter="filterTasksByStatus"
-    placeholder="Filter by status"
-    class="px-4 py-2 rounded w-[30%] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-  >
-  <div class="flex flex-wrap items-center w-[70%]">
-    <div
-      v-for="status in displayedFilterStatus"
-      :key="status"
-      class="flex items-center bg-blue-200 rounded-full px-3 py-1 text-sm font-semibold text-blue-700 m-1"
-    >
-      {{ status }}
-      <button
-        @click="cancelFilter(status)"
-        class="ml-2 text-xs bg-red-500 text-white rounded-full px-2 py-1 focus:outline-none"
-      >
-        x
-      </button>
-    </div>
-  </div>
+        @keyup.enter="filterTasksByStatus"
+        placeholder="Filter by status"
+        class="px-4 py-2 rounded w-[30%] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+      />
+      
+        <div
+          v-for="status in displayedFilterStatus"
+          :key="status"
+          class="flex items-center bg-blue-200 rounded-full px-3 py-1 text-sm font-semibold text-blue-700 m-1"
+        >
+          {{ status }}
+          <button
+            @click="cancelFilter(status)"
+            class="ml-2 text-xs bg-red-500 text-white rounded-full px-2 py-1 focus:outline-none"
+          >
+            x
+          </button>
+        </div>
+
+        <div
+          class="flex max-w-sm rounded-xl bg-gradient-to-tr from-pink-300 to-blue-300 p-0.5 shadow-lg"
+          :class="
+            isSortedByStatus
+              ? 'bg-gradient-to-tr from-red-600 to-pink-200'
+              : 'bg-gradient-to-tr from-pink-300 to-blue-300'
+          "
+        >
+          <button
+            @click="sortTasksByStatus"
+            class="flex-1 font-bold text-lg bg-white px-4 py-2 rounded-xl"
+            :class="
+              sortDirection === 0
+                ? 'text-gray-500'
+                : sortDirection === 1
+                ? 'text-blue-600'
+                : 'text-red-600'
+            "
+          >
+            Sort By Status
+          </button>
+        </div>
+      </div>
 
       <table
-      class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
+        class="table-lg style bg-blue-700 text-lg w-full rounded-lg shadow-lg overflow-hidden"
       >
         <thead
           class="text-white w-full bg-gradient-to-r from-pink-300 via-blue-200 to-purple-300"
@@ -172,15 +201,7 @@ onMounted(() => {
           <tr>
             <th class="w-1/3 text-center text-gray-800 py-2">Title</th>
             <th class="w-1/4 text-center text-gray-800 py-2">Assignees</th>
-            <th class="w-1/4 text-center text-gray-800 py-2">
-              <button
-                @click="sortTasksByStatus"
-                class="px-4 py-2 font-bold text-white rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-                :class="isSortedByStatus ? 'bg-green-500' : 'bg-blue-500'"
-              >
-                Status
-              </button>
-            </th>
+            <th class="w-1/4 text-center text-gray-800 py-2">Status</th>
             <th class="1/3 text-center py-2">
               <button
                 @click="gotoAdd"
