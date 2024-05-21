@@ -97,6 +97,18 @@ const addTodo = async () => {
 };
 const emit = defineEmits(["task-added"]);
 
+const isInputTooLong = (input, maxLength) => {
+  return input.length > maxLength;
+};
+
+const isAnyInputTooLong = computed(() => {
+  return (
+    isInputTooLong(newTodo.value.title, 100) ||
+    isInputTooLong(newTodo.value.description, 500) ||
+    isInputTooLong(newTodo.value.assignees, 30)
+  );
+});
+
 onMounted(async () => {
   await fetchStatuses();
 });
@@ -125,8 +137,13 @@ onMounted(async () => {
                 v-model="newTodo.title"
                 class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                 placeholder="Title"
-                maxlength="100"
               />
+              <p
+                v-if="isInputTooLong(newTodo.title, 100)"
+                class="text-red-500 text-sm"
+              >
+                Title is too long
+              </p>
             </h3>
 
             <div class="mt-2">
@@ -139,8 +156,13 @@ onMounted(async () => {
                 v-model="newTodo.description"
                 placeholder="Description"
                 class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200"
-                maxlength="500"
               ></textarea>
+              <p
+                v-if="isInputTooLong(newTodo.description, 500)"
+                class="text-red-500 text-sm"
+              >
+                Description is too long
+              </p>
             </div>
 
             <div class="mt-2">
@@ -171,8 +193,13 @@ onMounted(async () => {
                 v-model="newTodo.assignees"
                 class="input input-bordered w-full bg-gray-200"
                 placeholder="Assignees"
-                maxlength="30"
               />
+              <p
+                v-if="isInputTooLong(newTodo.assignees, 30)"
+                class="text-red-500 text-sm"
+              >
+                Assignees is too long
+              </p>
             </div>
           </div>
         </div>
@@ -184,7 +211,7 @@ onMounted(async () => {
             @click="addTodo"
             type="button"
             class="btn btn-outline btn-success ml-2 sm:ml-4"
-            :disabled="!newTodo.title.trim()"
+            :disabled="isAnyInputTooLong || !newTodo.title.trim()"
           >
             Save
           </button>

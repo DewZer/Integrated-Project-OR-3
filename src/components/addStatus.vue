@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 const API_ROOT = import.meta.env.VITE_BASE_URL;
@@ -53,6 +53,13 @@ const addStatus = async () => {
   toast.success('Status added successfully');
 };
 
+const MAX_NAME_LENGTH = 50;
+const MAX_DESCRIPTION_LENGTH = 200;
+
+const isNameTooLong = computed(() => newStatus.value.name.length > MAX_NAME_LENGTH);
+const isDescriptionTooLong = computed(() => newStatus.value.description.length > MAX_DESCRIPTION_LENGTH);
+
+
 </script>
 
 <template>
@@ -76,8 +83,8 @@ const addStatus = async () => {
                   v-model="newStatus.name"
                   class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                   placeholder="Status"
-                  maxlength="50"
                 />
+                <p v-if="isNameTooLong" class="text-red-500">Name is too long</p>
               </h3>
   
               <div class="mt-2">
@@ -88,8 +95,10 @@ const addStatus = async () => {
                   v-model="newStatus.description"
                   placeholder="Description"
                   class="textarea textarea-bordered w-full h-24 rounded-lg textarea-md text-lg bg-gray-200"
-                  maxlength="200"
+                  
                 ></textarea>
+                <p v-if="isDescriptionTooLong" class="text-red-500">Description is too long</p>
+
               </div>
             </div>
           </div>
@@ -101,7 +110,7 @@ const addStatus = async () => {
               @click="addStatus"
               type="button"
               class="btn btn-outline btn-success ml-2 sm:ml-4"
-              :disabled="!newStatus.name.trim()"
+              :disabled="!newStatus.name.trim() || isNameTooLong || isDescriptionTooLong"
             >
               Save
             </button>

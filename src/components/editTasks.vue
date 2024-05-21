@@ -181,6 +181,18 @@ const formatDate = (dateString) => {
   return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateString));
 };
 
+const isInputTooLong = (input, maxLength) => {
+  return input && input.length > maxLength;
+};
+
+const isAnyInputTooLong = computed(() => {
+  return (
+    isInputTooLong(selectedTodo.value.title, 100) ||
+    isInputTooLong(selectedTodo.value.description, 500) ||
+    isInputTooLong(selectedTodo.value.assignees, 30)
+  );
+});
+
 onMounted(async () => {
   await fetchStatuses();
   fetchDataById(route.params.id);
@@ -209,8 +221,14 @@ onMounted(async () => {
                 type="text"
                 v-model="selectedTodo.title"
                 class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
-                maxlength="100"
+                placeholder="Title"
               />
+              <p
+                v-if="isInputTooLong(selectedTodo.title, 100)"
+                class="text-red-500 text-sm"
+              >
+                Title is too long
+              </p>
             </h3>
 
             <div class="mt-2">
@@ -231,8 +249,13 @@ onMounted(async () => {
                     'bg-gray-200': !selectedTodo.description,
                   },
                 ]"
-                maxlength="500"
               ></textarea>
+              <p
+                v-if="isInputTooLong(selectedTodo.description, 500)"
+                class="text-red-500 text-sm"
+              >
+                Description is too long
+              </p>
             </div>
 
             <div class="mt-2">
@@ -265,8 +288,14 @@ onMounted(async () => {
                 class="input input-bordered w-full bg-gray-200"
                 :placeholder="assigneesText ? 'Assignees' : 'Unassigned'"
                 :class="{ italic: !assigneesText }"
-                maxlength="30"
               />
+              <p
+                v-if="isInputTooLong(assigneesText, 30)"
+                class="text-red-500 text-sm"
+              >
+                Assignees is too long
+              </p>
+
             </div>
 
             <div
@@ -310,7 +339,7 @@ onMounted(async () => {
             @click="closeModalWithEdit"
             type="button"
             class="btn btn-outline btn-success ml-2 sm:ml-4"
-            :disabled="isSaveButtonDisabled"
+            :disabled="isSaveButtonDisabled || isAnyInputTooLong"
           >
             Save
           </button>

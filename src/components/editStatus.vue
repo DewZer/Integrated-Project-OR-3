@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick, watch } from "vue";
+import { ref, onMounted,computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import { reactive, watchEffect } from "vue";
@@ -94,10 +94,19 @@ const closeModalWithEdit = async () => {
   }
 };
 
+const isNameTooLong = computed(() => selectedStatus.value?.name?.length > MAX_NAME_LENGTH);
+const isDescriptionTooLong = computed(() => selectedStatus.value?.description?.length > MAX_DESCRIPTION_LENGTH);
+
+
+const MAX_NAME_LENGTH = 50;
+const MAX_DESCRIPTION_LENGTH = 200;
+
 watchEffect(() => {
   isSaveButtonDisabled.value =
     !selectedStatus.value?.name.trim() ||
-    isEqual(selectedStatus.value, originalStatus.value);
+    isEqual(selectedStatus.value, originalStatus.value) ||
+    isNameTooLong.value ||
+    isDescriptionTooLong.value;
 });
 
 onMounted(() => {
@@ -130,8 +139,9 @@ onMounted(() => {
                 type="text"
                 class="input input-bordered w-full bg-gray-200 rounded-lg text-black mt-2"
                 placeholder="Status"
-                maxlength="50"
               />
+              <p v-if="isNameTooLong" class="text-red-500">Name is too long</p>
+
 
               <label for="status-description" class="label mt-4">
                 <span class="label-text text-2xl font-bold text-pink-400"
@@ -149,7 +159,7 @@ onMounted(() => {
                 "
                 maxlength="200"
               ></textarea>
-              <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
+              <p v-if="isDescriptionTooLong" class="text-red-500">Description is too long</p>
             </h3>
           </div>
         </div>
