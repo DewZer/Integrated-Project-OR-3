@@ -237,7 +237,7 @@ const availableStatuses = computed(() => {
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
             >
               <button
-                v-if="status.name !== 'no status'"
+                v-if="status.name !== 'no status'&& status.name !== 'Done'"
                 @click="gotoEditStatus(status)"
                 class="itbkk-button-edit btn btn-outline btn-primary bg-blue-200 btn-md"
               >
@@ -255,7 +255,7 @@ const availableStatuses = computed(() => {
               class="text-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 border-b border-gray-200"
             >
               <button
-                v-if="status.name !== 'no status'"
+                v-if="status.name !== 'no status' && status.name !== 'Done'"
                 @click="openDeleteModal(status)"
                 class="itbkk-button-delete btn btn-outline btn-danger bg-red-200 btn-md"
               >
