@@ -157,7 +157,6 @@ onMounted(() => {
                     ? ''
                     : 'No description provided'
                 "
-                maxlength="200"
               ></textarea>
               <p v-if="isDescriptionTooLong" class="text-red-500">Description is too long</p>
             </h3>
