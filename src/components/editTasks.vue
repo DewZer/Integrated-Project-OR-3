@@ -189,9 +189,21 @@ const isAnyInputTooLong = computed(() => {
   return (
     isInputTooLong(selectedTodo.value.title, 100) ||
     isInputTooLong(selectedTodo.value.description, 500) ||
-    isInputTooLong(selectedTodo.value.assignees, 30)
+    isInputTooLong(selectedTodo.value.assigneesText, 30)
   );
 });
+
+watch(
+  [selectedTodo, assigneesText],
+  () => {
+    isSaveButtonDisabled.value =
+      !selectedTodo.value.title.trim() ||
+      isInputTooLong(assigneesText.value, 30) ||
+      (deepEqual(selectedTodo.value, originalTodo.value) &&
+        assigneesText.value === originalTodo.value.assignees);
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   await fetchStatuses();
