@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  frontend:
+    image: nginx:alpine
+    container_name: frontend-or3-default
+    ports:
+      - 80:80
+    volumes:
+      - ./Integrated-Project-OR-3/dist:/usr/share/nginx/html
+      - ./Integrated-Project-OR-3/default.conf:/etc/nginx/conf.d/default.conf
+
+  backend:
+    build:
+      context: ./backend-OR3
+      dockerfile: Dockerfile
+    container_name: backend-OR3
+    ports:
+      - 8080:8080
