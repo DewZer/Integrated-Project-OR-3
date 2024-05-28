@@ -129,11 +129,6 @@ const getTimeZone = () => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-watch(showEditModal, (newVal) => {
-  if (newVal) {
-    openModal();
-  }
-});
 
 const closeModal = () => {
   showEditModal.value = false;

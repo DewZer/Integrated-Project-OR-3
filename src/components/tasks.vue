@@ -13,7 +13,6 @@ let isSortedByStatus = false;
 let originalTasks = [];
 
 const filterStatus = ref([]);
-const filterStatusBoxVisible = ref(false);
 const displayedFilterStatus = ref([]);
 
 const toast = useToast();
@@ -90,7 +89,6 @@ const gotoAdd = () => {
 
 // filter status
 const filterTasksByStatus = (event) => {
-  // Step 2
   const status = event.target.value.trim();
   if (status && !filterStatus.value.includes(status)) {
     filterStatus.value.push(status);
